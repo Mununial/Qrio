@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Management World - SkillVerse</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            background: #0f172a;
+            color: #f8fafc;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+        }
+
+        .cityscape {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 300px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300"><path d="M0,300 L0,200 L50,200 L50,150 L100,150 L100,50 L200,50 L200,250 L300,250 L300,100 L400,100 L400,200 L500,200 L500,0 L600,0 L600,150 L700,150 L700,100 L800,100 L800,200 L900,200 L900,50 L1000,50 L1000,300 Z" fill="%231e293b" opacity="0.5"/></svg>');
+            background-size: contain;
+            z-index: -1;
+            animation: drift 60s linear infinite;
+        }
+
+        @keyframes drift {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: -1000px 0;
+            }
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #334155;
+        }
+
+        .hud {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat h3 {
+            color: #94a3b8;
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .stat p {
+            margin: 5px 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+
+        .btn-exit {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .dashboard {
+            max-width: 900px;
+            margin: 50px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid #475569;
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #cbd5e1;
+        }
+
+        button.action {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        button.action:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        button.action:disabled {
+            background: #475569;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #334155;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #22c55e;
+            width: 0%;
+            transition: 0.5s;
+        }
+
+        #log {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            height: 100px;
+            overflow-y: auto;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            display: none;
+        }
+
+        .game-over h1 {
+            color: #ef4444;
+            font-size: 4rem;
+            margin-bottom: 0;
+        }
+
+        .game-over p {
+            color: #94a3b8;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cityscape"></div>
+    <nav>
+        <div style="font-weight: bold; font-size: 1.5rem;">SkillVerse • Business Simulator</div>
+        <div class="hud">
+            <div class="stat">
+                <h3>Capital</h3>
+                <p id="money">$1,000</p>
+            </div>
+            <div class="stat">
+                <h3>Staff</h3>
+                <p id="staff">1</p>
+            </div>
+            <div class="stat">
+                <h3>XP Points</h3>
+                <p id="xp" style="color:#22c55e;">0 px</p>
+            </div>
+        </div>
+        <button class="btn-exit" onclick="window.close()">Walk Away</button>
+    </nav>
+
+    <div class="dashboard">
+        <div class="card">
+            <h2>Operations</h2>
+            <p>Run your company for a week to generate revenue based on staff and marketing reach.</p>
+            <button class="action" onclick="runWeek()">Run Week</button>
+            <div id="log">Welcome to your new startup! Invest capital into growth.</div>
+        </div>
+
+        <div class="card">
+            <h2>Investments</h2>
+            <div style="margin-bottom: 20px;">
+                <p>Hire Staff (-$500)</p>
+                <button class="action" id="btn-staff" style="background: #8b5cf6;" onclick="hireStaff()">Hire
+                    Employee</button>
+            </div>
+            <div>
+                <p>Marketing Campaign (-$300)</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="market-fill"></div>
+                </div>
+                <button class="action" id="btn-market" style="background: #ec4899;" onclick="boostMarketing()">Boost
+                    Marketing</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOverScreen">
+        <h1>BANKRUPT</h1>
+        <p>Your startup ran out of capital.</p>
+        <button class="action" style="width:auto; padding: 15px 30px;" onclick="location.reload()">Start New
+            Concept</button>
+    </div>
+
+    <script>
+        let money = 1000;
+        let staff = 1;
+        let marketingLevel = 1;
+        let xp = 0;
+
+        function updateUI() {
+            document.getElementById('money').innerText = "$" + money;
+            document.getElementById('staff').innerText = staff;
+            document.getElementById('xp').innerText = xp + " px";
+            document.getElementById('btn-staff').disabled = money < 500;
+            document.getElementById('btn-market').disabled = money < 300 || marketingLevel >= 5;
+            document.getElementById('market-fill').style.width = (marketingLevel * 20) + "%";
+        }
+
+        function logMsg(msg) {
+            const log = document.getElementById('log');
+            log.innerHTML = msg + "<br><br>" + log.innerHTML;
+        }
+
+        function awardXP(amount) {
+            xp += amount;
+            let activeId = localStorage.getItem('QRIO_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: amount })
+                }).catch(console.error);
+            }
+        }
+
+        function runWeek() {
+            let revenue = (staff * 200) * (1 + (marketingLevel * 0.2));
+            let costs = (staff * 100);
+            let profit = Math.floor(revenue - costs);
+
+            money += profit;
+
+            // Random unexpected cost to simulate business volatility
+            if (Math.random() < 0.25) {
+                let surpriseCost = Math.floor(Math.random() * 300) + 150;
+                money -= surpriseCost;
+                logMsg(`<span style="color:#ef4444">Surprise deduction! Server crash cost $${surpriseCost}</span>`);
+            }
+            logMsg(`Week complete. Revenue: $${Math.floor(revenue)}, Wages: $${costs}. Net: <b>$${profit}</b>`);
+
+            if (money < 0) {
+                updateUI();
+                document.getElementById('gameOverScreen').style.display = 'flex';
+                return;
+            }
+
+            awardXP(10);
+            updateUI();
+        }
+
+        function hireStaff() {
+            if (money >= 500) {
+                money -= 500;
+                staff++;
+                awardXP(25);
+                logMsg("Hired a new talented employee!");
+                updateUI();
+            }
+        }
+
+        function boostMarketing() {
+            if (money >= 300 && marketingLevel < 5) {
+                money -= 300;
+                marketingLevel++;
+                awardXP(25);
+                logMsg("Launched brand marketing campaign! Revenue multiplier increased.");
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+
+</html>

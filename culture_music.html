@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Rhythm - Music Room</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        body {
+            margin: 0;
+            background: #2e1065;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        nav {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 2px solid #a855f7;
+            color: #a855f7;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Outfit';
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: #d8b4fe;
+            font-size: 3rem;
+        }
+
+        .score-hud {
+            font-size: 2rem;
+            color: #facc15;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .game-area {
+            width: 400px;
+            height: 500px;
+            border: 4px solid #7e22ce;
+            border-radius: 20px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(126, 34, 206, 0.4);
+        }
+
+        .hit-zone {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(250, 204, 21, 0.2);
+            border-top: 3px dashed #facc15;
+            border-bottom: 3px dashed #facc15;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .hit-zone-text {
+            color: #fef08a;
+            font-weight: 900;
+            opacity: 0.5;
+        }
+
+        .column {
+            position: absolute;
+            top: 0;
+            width: 33.33%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .column:last-child {
+            border-right: none;
+        }
+
+        #col0 {
+            left: 0%;
+        }
+
+        #col1 {
+            left: 33.33%;
+        }
+
+        #col2 {
+            left: 66.66%;
+        }
+
+        .note {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #c084fc 0%, #7e22ce 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 15px #c084fc;
+            text-align: center;
+            line-height: 60px;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            width: 400px;
+            justify-content: space-between;
+        }
+
+        .drum-btn {
+            flex: 1;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 15px;
+            background: #6b21a8;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 10px 0 #4c1d95;
+            font-family: 'Outfit';
+        }
+
+        .drum-btn:active,
+        .drum-btn.active {
+            transform: translateY(10px);
+            box-shadow: 0 0 0 #4c1d95;
+            background: #a855f7;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(46, 16, 101, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .game-over h2 {
+            font-size: 4rem;
+            color: #a855f7;
+            margin: 0;
+        }
+
+        .btn {
+            background: #a855f7;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            font-family: 'Outfit';
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div style="font-weight: 900; font-size: 1.5rem; color: #e9d5ff;"> Rhythm Room
+        </div>
+        <button class="btn-back" onclick="window.close()">Exit Room</button>
+    </nav>
+
+    <h1>Indian Tabla Rhythm</h1>
+    <div class="score-hud">Score: <span id="scoreVal">0</span> / 10</div>
+
+    <div class="game-area" id="engine">
+        <div class="column" id="col0"></div>
+        <div class="column" id="col1"></div>
+        <div class="column" id="col2"></div>
+
+        <div class="hit-zone">
+            <span class="hit-zone-text">THA</span>
+            <span class="hit-zone-text">DHIN</span>
+            <span class="hit-zone-text">NA</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="drum-btn" onclick="hit(0)">THA</button>
+        <button class="drum-btn" onclick="hit(1)">DHIN</button>
+        <button class="drum-btn" onclick="hit(2)">NA</button>
+    </div>
+
+    <div class="game-over" id="gameO">
+        <h2>Performance Over</h2>
+        <p style="color:#d8b4fe; font-size:1.5rem;">Great sense of rhythm!</p>
+        <p style="color: #facc15; font-size: 2rem;" id="endScore">+0 Points Earned!</p>
+        <button class="btn" onclick="window.close()">Return</button>
+    </div>
+
+    <script>
+        let notes = [];
+        let score = 0;
+        let spawned = 0;
+        let missed = 0;
+        let speed = 4;
+        let isRunning = true;
+
+        const symbols = ["T", "D", "N"]; // Th, Dhi, Na
+
+        // Keybindings
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'a' || e.key === 'ArrowLeft') hit(0);
+            if (e.key === 's' || e.key === 'ArrowDown') hit(1);
+            if (e.key === 'd' || e.key === 'ArrowRight') hit(2);
+        });
+
+        function spawnNote() {
+            if (!isRunning || spawned >= 15) return;
+            const colIdx = Math.floor(Math.random() * 3);
+            const el = document.createElement('div');
+            el.className = 'note';
+            el.innerText = symbols[colIdx];
+            el.style.top = '-60px'; // start off screen
+
+            document.getElementById('col' + colIdx).appendChild(el);
+            notes.push({ el: el, col: colIdx, y: -60, active: true });
+
+            spawned++;
+            setTimeout(spawnNote, Math.random() * 1000 + 800);
+        }
+
+        function gameLoop() {
+            if (!isRunning) return;
+
+            notes.forEach(note => {
+                if (note.active) {
+                    note.y += speed;
+                    note.el.style.top = note.y + 'px';
+
+                    // 400 is track height roughly. Hit zone is 400->480
+                    if (note.y > 500) {
+                        note.active = false;
+                        note.el.remove();
+                        missed++;
+                        checkEnd();
+                    }
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function hit(colIdx) {
+            if (!isRunning) return;
+
+            // visual feedback
+            const btns = document.querySelectorAll('.drum-btn');
+            btns[colIdx].classList.add('active');
+            setTimeout(() => btns[colIdx].classList.remove('active'), 100);
+
+            // check notes
+            let hitNode = notes.find(n => n.active && n.col === colIdx && n.y > 350 && n.y < 460);
+            if (hitNode) {
+                hitNode.active = false;
+                hitNode.el.style.background = '#4ade80';
+                hitNode.el.style.boxShadow = '0 0 20px #4ade80';
+                hitNode.el.innerText = '✓';
+                setTimeout(() => hitNode.el.remove(), 200);
+
+                score++;
+                document.getElementById('scoreVal').innerText = score;
+
+                // award point per hit
+                let activeId = localStorage.getItem('QRIO_active_id');
+                if (activeId) {
+                    fetch('http://localhost:5000/api/points', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: activeId, pointsToAdd: 5 })
+                    }).catch(console.error);
+                }
+            } else {
+                // miss penalty flash
+                document.getElementById('engine').style.borderColor = '#ef4444';
+                setTimeout(() => document.getElementById('engine').style.borderColor = '#7e22ce', 150);
+            }
+            checkEnd();
+        }
+
+        function checkEnd() {
+            if (score + missed >= 15) {
+                isRunning = false;
+                document.getElementById('endScore').innerText = `+${score * 5} Points Earned Total!`;
+                document.getElementById('gameO').style.display = 'flex';
+            }
+        }
+
+        setTimeout(spawnNote, 1000);
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+
+</html>

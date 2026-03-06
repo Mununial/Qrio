@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GlobeTrotter Quest</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;800&display=swap');
+
+        /* GLOBALS & VARIABLES */
+        :root {
+            --bg-ocean: #38bdf8;
+            --btn-blue: #0ea5e9;
+            --btn-blue-shade: #0284c7;
+            --btn-yellow: #facc15;
+            --btn-yellow-shade: #ca8a04;
+            --btn-green: #4ade80;
+            --btn-green-shade: #16a34a;
+            --btn-pink: #f472b6;
+            --btn-pink-shade: #db2777;
+            --white: #ffffff;
+            --black: #1f2937;
+            --font-title: 'Fredoka One', cursive;
+            --font-body: 'Nunito', sans-serif;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-ocean);
+            font-family: var(--font-body);
+            color: var(--black);
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* SCREENS & TRANSITIONS */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            box-sizing: border-box;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* BUTTONS */
+        .btn-3d {
+            background: var(--btn-yellow);
+            color: var(--btn-yellow-shade);
+            border-radius: 1.5rem;
+            padding: 1rem 2rem;
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            border: 2px solid var(--white);
+            box-shadow: 0 8px 0 var(--btn-yellow-shade), 0 15px 20px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .btn-3d:active {
+            transform: translateY(8px);
+            box-shadow: 0 0 0 var(--btn-yellow-shade);
+        }
+
+        .btn-blue {
+            background: var(--btn-blue);
+            color: var(--white);
+            box-shadow: 0 8px 0 var(--btn-blue-shade);
+        }
+
+        .btn-blue:active {
+            box-shadow: 0 0 0 var(--btn-blue-shade);
+        }
+
+        .btn-green {
+            background: var(--btn-green);
+            color: var(--white);
+            box-shadow: 0 8px 0 var(--btn-green-shade);
+        }
+
+        .btn-green:active {
+            box-shadow: 0 0 0 var(--btn-green-shade);
+        }
+
+        .btn-pink {
+            background: var(--btn-pink);
+            color: var(--white);
+            box-shadow: 0 8px 0 var(--btn-pink-shade);
+        }
+
+        .btn-pink:active {
+            box-shadow: 0 0 0 var(--btn-pink-shade);
+        }
+
+        .btn-disabled {
+            filter: grayscale(1);
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* HEADER UI */
+        .top-hud {
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .hud-panel {
+            background: var(--white);
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .hud-panel:hover {
+            transform: scale(1.05);
+        }
+
+        /* LOGIN SCREEN */
+        #login-screen {
+            justify-content: center;
+            background: radial-gradient(circle, #7dd3fc, var(--bg-ocean));
+        }
+
+        .logo-title {
+            font-family: var(--font-title);
+            font-size: 4rem;
+            color: var(--white);
+            text-shadow: 0 6px 0 var(--btn-blue-shade);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .avatar-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .avatar-select {
+            font-size: 4rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .avatar-select.selected {
+            background: var(--white);
+            box-shadow: 0 0 20px var(--btn-yellow);
+            transform: scale(1.1);
+        }
+
+        .name-input {
+            font-size: 1.5rem;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 3px solid var(--white);
+            font-family: var(--font-body);
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+            margin-bottom: 2rem;
+        }
+
+        /* MAP SCREEN */
+        .world-map-svg {
+            width: 90%;
+            max-width: 1000px;
+            height: auto;
+            margin-top: 5rem;
+            filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.2));
+        }
+
+        .continent {
+            cursor: pointer;
+            transition: all 0.3s;
+            stroke: var(--white);
+            stroke-width: 3;
+        }
+
+        .continent:hover:not(.locked) {
+            transform: translateY(-5px);
+            filter: brightness(1.1);
+        }
+
+        .continent.locked {
+            fill: #9ca3af !important;
+            pointer-events: none;
+        }
+
+        .cont-text {
+            font-family: var(--font-title);
+            fill: var(--white);
+            font-size: 24px;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .global-prog {
+            width: 80%;
+            max-width: 600px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-top: 2rem;
+            overflow: hidden;
+            border: 2px solid white;
+        }
+
+        .global-prog-fill {
+            height: 100%;
+            background: var(--btn-green);
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        /* COUNTRY SELECTION (LEVELS) */
+        #country-screen {
+            justify-content: flex-start;
+            padding-top: 6rem;
+            background: var(--white);
+        }
+
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            width: 90%;
+            max-width: 1000px;
+            margin-top: 2rem;
+        }
+
+        .level-card {
+            background: #f3f4f6;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 0 #d1d5db;
+            position: relative;
+        }
+
+        .level-card.unlocked {
+            background: var(--btn-blue);
+            box-shadow: 0 10px 0 var(--btn-blue-shade);
+            color: white;
+        }
+
+        .level-card h2 {
+            font-family: var(--font-title);
+            margin: 0 0 1rem 0;
+            font-size: 2rem;
+        }
+
+        .stars-display {
+            font-size: 2rem;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* GAME SCREEN (GENERAL) */
+        #game-screen {
+            background: radial-gradient(circle, #fcd34d, #fb923c);
+            justify-content: center;
+        }
+
+        .game-header {
+            position: absolute;
+            top: 1rem;
+            width: 100%;
+            text-align: center;
+            font-family: var(--font-title);
+            font-size: 2rem;
+            color: white;
+            text-shadow: 0 4px 0 #ca8a04;
+        }
+
+        .timer-circle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-title);
+            font-size: 2rem;
+            color: #ef4444;
+            border: 4px solid #ef4444;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-board {
+            background: white;
+            padding: 2rem;
+            border-radius: 2rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+        }
+
+        .game-question {
+            font-size: 2rem;
+            font-family: var(--font-title);
+            margin-bottom: 2rem;
+            color: var(--btn-blue-shade);
+        }
+
+        /* MINI GAMES SPECIFIC */
+        /* Flag Frenzy & Capital Dash */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .opt-btn {
+            font-size: 4rem;
+            background: #f3f4f6;
+            border: 4px solid #e5e7eb;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, border-color 0.2s;
+        }
+
+        .opt-btn.text-opt {
+            font-size: 1.5rem;
+            font-family: var(--font-title);
+            color: var(--btn-blue-shade);
+            padding: 1.5rem;
+        }
+
+        .opt-btn:active {
+            transform: scale(0.95);
+        }
+
+        .opt-btn.correct {
+            border-color: var(--btn-green);
+            background: #dcfce7;
+            box-shadow: 0 0 20px var(--btn-green);
+        }
+
+        .opt-btn.wrong {
+            border-color: #ef4444;
+            background: #fee2e2;
+        }
+
+        /* Monument Match */
+        .match-area {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            align-items: center;
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        .drag-col,
+        .drop-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 45%;
+        }
+
+        .drag-item {
+            background: var(--btn-pink);
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-weight: bold;
+            font-family: var(--font-title);
+            touch-action: none;
+            cursor: grab;
+            position: relative;
+            z-index: 100;
+            box-shadow: 0 5px 0 var(--btn-pink-shade);
+            text-align: center;
+        }
+
+        .drag-item:active {
+            cursor: grabbing;
+        }
+
+        .drop-zone {
+            background: #f3f4f6;
+            border: 3px dashed #9ca3af;
+            padding: 1rem;
+            border-radius: 1rem;
+            font-weight: bold;
+            color: #9ca3af;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            font-family: var(--font-title);
+        }
+
+        .drop-zone.hover {
+            background: #e0f2fe;
+            border-color: var(--btn-blue);
+        }
+
+        .drop-zone.matched {
+            border-style: solid;
+            background: #dcfce7;
+            color: var(--btn-green-shade);
+            border-color: var(--btn-green);
+        }
+
+        /* Map Tap */
+        .map-tap-svg {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+
+        .tap-region {
+            fill: #d1d5db;
+            stroke: white;
+            stroke-width: 2;
+            cursor: pointer;
+            transition: fill 0.2s;
+        }
+
+        .tap-region:hover {
+            fill: var(--btn-blue);
+        }
+
+        .tap-region.correct {
+            fill: var(--btn-green) !important;
+            animation: pulseWin 1s infinite alternate;
+        }
+
+        .tap-region.wrong {
+            fill: #ef4444 !important;
+        }
+
+        /* OVERLAYS & EFFECTS */
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .result-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+        }
+
+        .result-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 2rem;
+            text-align: center;
+            animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-box h1 {
+            font-family: var(--font-title);
+            font-size: 3rem;
+            margin: 0;
+            color: var(--btn-yellow-shade);
+        }
+
+        .result-stars {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin: 1rem 0;
+            letter-spacing: 10px;
+        }
+
+        .star-earned {
+            color: #facc15;
+            text-shadow: 0 0 20px #facc15;
+        }
+
+        /* PROFILE */
+        #profile-screen {
+            background: var(--bg-ocean);
+            overflow-y: scroll;
+            padding-top: 6rem;
+        }
+
+        .profile-card {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .rank-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--btn-pink-shade);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .badge {
+            background: #f3f4f6;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            filter: grayscale(1);
+            opacity: 0.5;
+            transition: all 0.5s;
+            position: relative;
+        }
+
+        .badge.earned {
+            filter: grayscale(0);
+            opacity: 1;
+            background: #fef08a;
+            box-shadow: 0 0 15px #facc15;
+            animation: popUp 0.5s;
+        }
+
+        .badge-tt {
+            position: absolute;
+            bottom: -25px;
+            font-size: 0.8rem;
+            font-family: var(--font-body);
+            background: var(--black);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .badge:hover .badge-tt {
+            opacity: 1;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulseWin {
+            0% {
+                filter: brightness(1);
+            }
+
+            100% {
+                filter: brightness(1.3);
+                box-shadow: 0 0 30px #4ade80;
+            }
+        }
+
+        /* LEADERBOARD */
+        .leaderboard-box {
+            margin-top: 2rem;
+            text-align: left;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+        }
+
+        .lb-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            font-family: var(--font-title);
+            color: var(--btn-blue-shade);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- AUDIO CONTEXT (Generated dynamically) -->
+
+    <!-- TOP HUD -->
+    <div class="top-hud" id="hud" style="display: none;">
+        <div class="hud-panel" onclick="showScreen('profile')">
+            <span id="hud-avatar">✈️</span> <span id="hud-name">Player</span>
+        </div>
+        <div class="hud-panel" onclick="showScreen('world-map')" style="background: var(--btn-blue); color: white;">
+            🌍 Map
+        </div>
+        <div class="hud-panel">
+            ⭐ <span id="hud-miles">0</span> Miles
+        </div>
+    </div>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div class="screen active" id="login-screen">
+        <h1 class="logo-title">🌍 GlobeTrotter Quest 🗺️</h1>
+        <div
+            style="background: white; padding: 3rem; border-radius: 2rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+            <h2>Choose Your Avatar</h2>
+            <div class="avatar-box">
+                <div class="avatar-select selected" onclick="selectAvatar(this, '🤠')">🤠</div>
+                <div class="avatar-select" onclick="selectAvatar(this, '👩‍🚀')">👩‍🚀</div>
+                <div class="avatar-select" onclick="selectAvatar(this, '🕵️')">🕵️</div>
+                <div class="avatar-select" onclick="selectAvatar(this, '🥷')">🥷</div>
+            </div>
+            <input type="text" class="name-input" id="player-name" placeholder="Enter Explorer Name..." maxlength="15">
+            <br>
+            <button class="btn-3d" onclick="login()">Start Adventure!</button>
+        </div>
+    </div>
+
+    <!-- 2. WORLD MAP SCREEN -->
+    <div class="screen" id="world-map">
+        <h1
+            style="font-family: var(--font-title); color: white; font-size: 3rem; margin: 0; text-shadow: 0 4px 0 var(--btn-blue-shade); margin-top: 4rem;">
+            Choose Continent</h1>
+
+        <!-- Abstract Stylized Map -->
+        <svg class="world-map-svg" viewBox="0 0 1000 500">
+            <!-- North America -->
+            <g id="cont_na" class="continent" fill="#f87171" onclick="selectContinent('na')">
+                <path d="M 150 50 L 350 50 Q 400 150 300 300 L 150 250 Z" />
+                <text x="210" y="150" class="cont-text">N. America</text>
+            </g>
+            <!-- South America -->
+            <g id="cont_sa" class="continent locked" fill="#fbbf24" onclick="selectContinent('sa')">
+                <path d="M 280 320 L 400 320 L 350 480 L 250 400 Z" />
+                <text x="290" y="400" class="cont-text">S. America</text>
+                <text x="310" y="430" class="cont-text" font-size="16">🔒</text>
+            </g>
+            <!-- Europe -->
+            <g id="cont_eu" class="continent locked" fill="#60a5fa" onclick="selectContinent('eu')">
+                <path d="M 450 50 L 600 50 L 650 150 L 400 150 Z" />
+                <text x="480" y="110" class="cont-text">Europe</text>
+                <text x="520" y="140" class="cont-text" font-size="16">🔒</text>
+            </g>
+            <!-- Africa -->
+            <g id="cont_af" class="continent locked" fill="#4ade80" onclick="selectContinent('af')">
+                <path d="M 420 180 L 620 180 L 580 380 L 400 300 Z" />
+                <text x="480" y="280" class="cont-text">Africa</text>
+                <text x="500" y="310" class="cont-text" font-size="16">🔒</text>
+            </g>
+            <!-- Asia -->
+            <g id="cont_as" class="continent locked" fill="#c084fc" onclick="selectContinent('as')">
+                <path d="M 620 50 L 900 50 L 850 250 L 550 250 Z" />
+                <text x="700" y="150" class="cont-text">Asia</text>
+                <text x="730" y="180" class="cont-text" font-size="16">🔒</text>
+            </g>
+            <!-- Oceania -->
+            <g id="cont_oc" class="continent locked" fill="#f472b6" onclick="selectContinent('oc')">
+                <path d="M 750 300 L 950 300 L 900 450 L 700 400 Z" />
+                <text x="800" y="380" class="cont-text">Oceania</text>
+                <text x="830" y="410" class="cont-text" font-size="16">🔒</text>
+            </g>
+        </svg>
+
+        <div class="global-prog">
+            <div class="global-prog-fill" id="map-prog-fill"></div>
+        </div>
+        <p style="color: white; font-weight: bold;">Global Progress: <span id="map-prog-text">0%</span></p>
+    </div>
+
+    <!-- 3. COUNTRY SCREEN (LEVELS) -->
+    <div class="screen" id="country-screen">
+        <h1 id="cont-title" style="font-family: var(--font-title); font-size: 3rem; color: var(--btn-blue-shade);">
+            Continent</h1>
+        <div class="country-grid" id="country-grid">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+
+    <!-- 4. GAME SCREEN -->
+    <div class="screen" id="game-screen">
+        <div class="game-header" id="game-country-title">Country Name</div>
+        <div class="timer-circle" id="game-timer">30</div>
+
+        <div class="game-board" id="game-board">
+            <!-- Rendered by JS based on Minigame Type -->
+        </div>
+    </div>
+
+    <!-- 5. PROFILE SCREEN -->
+    <div class="screen" id="profile-screen">
+        <div class="profile-card">
+            <div style="font-size: 5rem;" id="prof-avatar">🤠</div>
+            <h1 id="prof-name"
+                style="font-family: var(--font-title); font-size: 3rem; margin: 0; color: var(--btn-blue-shade);">Player
+            </h1>
+            <div class="rank-title" id="prof-rank">Tourist</div>
+            <p style="font-size: 1.5rem; font-weight: bold; color: #6b7280;">Total Travel Miles: <span id="prof-miles"
+                    style="color: var(--btn-yellow-shade);">0</span> ✈️</p>
+
+            <h2
+                style="font-family: var(--font-title); text-align: left; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+                Passport Stamps</h2>
+            <div class="badge-grid" id="prof-badges">
+                <div class="badge" id="badge-first">
+                    <div class="badge-tt">First Flight (Clear 1)</div>🛫
+                </div>
+                <div class="badge" id="badge-master">
+                    <div class="badge-tt">Master (3 Stars on 5)</div>🌟
+                </div>
+                <div class="badge" id="badge-world">
+                    <div class="badge-tt">World Traveler (Clear All)</div>🌍
+                </div>
+            </div>
+
+            <h2
+                style="font-family: var(--font-title); text-align: left; margin-top: 2rem; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">
+                Local Leaderboard</h2>
+            <div class="leaderboard-box" id="leaderboard">
+                <!-- Stored top 3 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULT OVERLAY -->
+    <div class="result-overlay" id="result-overlay">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="result-box">
+            <h1 id="result-title">Level Cleared!</h1>
+            <div class="result-stars" id="result-stars">★ ★ ★</div>
+            <p style="font-size: 1.5rem; font-weight: bold; color: #6b7280;">+ <span id="result-miles">0</span> Miles
+            </p>
+            <button class="btn-3d btn-green" onclick="closeResultAndBackToMap()">Continue Journey</button>
+        </div>
+    </div>
+
+    <script>
+        /* === GAME DATA === */
+        const GAME_TYPES = { FLAG: 'FLAG_FRENZY', CAPITAL: 'CAPITAL_DASH', MONUMENT: 'MONUMENT_MATCH', MAP: 'MAP_TAP' };
+
+        const worldData = {
+            na: {
+                id: 'na', name: 'North America', unlockReq: 0,
+                countries: [
+                    { id: 'na_usa', name: 'USA', type: GAME_TYPES.FLAG, q: 'Which flag belongs to the USA?', opts: ['🇺🇸', '🇬🇧', '🇱🇷', '🇲🇾'], ans: '🇺🇸', mapId: 'na' },
+                    { id: 'na_can', name: 'Canada', type: GAME_TYPES.CAPITAL, q: 'What is the capital of Canada?', opts: ['Toronto', 'Vancouver', 'Ottawa', 'Montreal'], ans: 'Ottawa', mapId: 'na' },
+                    { id: 'na_mex', name: 'Mexico', type: GAME_TYPES.MONUMENT, monuments: ['Chichen Itza', 'Statue of Liberty', 'CN Tower'], c_opts: ['Mexico', 'USA', 'Canada'], matches: { 'Chichen Itza': 'Mexico', 'Statue of Liberty': 'USA', 'CN Tower': 'Canada' }, mapId: 'na' }
+                ]
+            },
+            sa: {
+                id: 'sa', name: 'South America', unlockReq: 3, // Requires 3 completed countries
+                countries: [
+                    { id: 'sa_bra', name: 'Brazil', type: GAME_TYPES.FLAG, q: 'Which is the flag of Brazil?', opts: ['🇧🇷', '🇦🇷', '🇨🇴', '🇵🇪'], ans: '🇧🇷', mapId: 'sa' },
+                    { id: 'sa_arg', name: 'Argentina', type: GAME_TYPES.MAP, q: 'Tap on Argentina in the map below!', tgt: 'arg_path', svg: '<svg viewBox="0 0 200 300"><path id="bra_path" class="tap-region" d="M 50 20 L 180 20 L 150 150 L 50 100 Z" /><path id="arg_path" class="tap-region" d="M 50 100 L 150 150 L 100 280 L 40 280 Z" /><text x="100" y="70" fill="#fff" pointer-events="none">🇧🇷</text></svg>' }
+                ]
+            },
+            eu: {
+                id: 'eu', name: 'Europe', unlockReq: 5,
+                countries: [
+                    { id: 'eu_fra', name: 'France', type: GAME_TYPES.MONUMENT, monuments: ['Eiffel Tower', 'Colosseum', 'Big Ben'], c_opts: ['France', 'Italy', 'UK'], matches: { 'Eiffel Tower': 'France', 'Colosseum': 'Italy', 'Big Ben': 'UK' } },
+                    { id: 'eu_ita', name: 'Italy', type: GAME_TYPES.CAPITAL, q: 'What is the capital of Italy?', opts: ['Milan', 'Rome', 'Venice', 'Naples'], ans: 'Rome' },
+                    { id: 'eu_ger', name: 'Germany', type: GAME_TYPES.FLAG, q: 'Find the German flag!', opts: ['🇧🇪', '🇩🇪', '🇦🇹', '🇳🇱'], ans: '🇩🇪' }
+                ]
+            },
+            af: {
+                id: 'af', name: 'Africa', unlockReq: 8,
+                countries: [
+                    { id: 'af_egy', name: 'Egypt', type: GAME_TYPES.MONUMENT, monuments: ['Pyramids', 'Table Mountain', 'Mount Kilimanjaro'], c_opts: ['Egypt', 'South Africa', 'Tanzania'], matches: { 'Pyramids': 'Egypt', 'Table Mountain': 'South Africa', 'Mount Kilimanjaro': 'Tanzania' } }
+                ]
+            },
+            as: {
+                id: 'as', name: 'Asia', unlockReq: 9,
+                countries: [
+                    { id: 'as_jpn', name: 'Japan', type: GAME_TYPES.FLAG, q: 'Which is Japan?', opts: ['🇰🇷', '🇯🇵', '🇨🇳', '🇧🇩'], ans: '🇯🇵' },
+                    { id: 'as_ind', name: 'India', type: GAME_TYPES.CAPITAL, q: 'Capital of India?', opts: ['Mumbai', 'Kolkata', 'New Delhi', 'Chennai'], ans: 'New Delhi' }
+                ]
+            },
+            oc: {
+                id: 'oc', name: 'Oceania', unlockReq: 11,
+                countries: [
+                    { id: 'oc_aus', name: 'Australia', type: GAME_TYPES.CAPITAL, q: 'Capital of Australia?', opts: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'], ans: 'Canberra' }
+                ]
+            }
+        };
+
+        const TOTAL_COUNTRIES = Object.values(worldData).reduce((sum, c) => sum + c.countries.length, 0);
+
+        /* === PLAYER STATE === */
+        let player = {
+            name: '', avatar: '🤠', miles: 0,
+            completed: {}, // id: stars
+            badges: []
+        };
+        let leaderboard = [
+            { name: 'Magellan', miles: 5000 },
+            { name: 'Columbus', miles: 3000 },
+            { name: 'Polo', miles: 1000 }
+        ];
+
+        /* === AUDIO SYSTEM === */
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playTone(freq, type, dur, vol = 0.1) {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            osc.start(); osc.stop(audioCtx.currentTime + dur);
+        }
+        function sndClick() { playTone(400, 'sine', 0.1); }
+        function sndCorrect() { playTone(600, 'triangle', 0.1); setTimeout(() => playTone(800, 'triangle', 0.2), 100); }
+        function sndWrong() { playTone(200, 'sawtooth', 0.3); }
+        function sndWin() {
+            playTone(400, 'square', 0.1); setTimeout(() => playTone(500, 'square', 0.1), 100);
+            setTimeout(() => playTone(600, 'square', 0.1), 200); setTimeout(() => playTone(800, 'square', 0.4), 300);
+        }
+        function sndBadge() { playTone(1200, 'sine', 0.5, 0.2); }
+
+        /* === CORE LOGIC & NAVIGATION === */
+        function loadProgress() {
+            let saved = localStorage.getItem('globetrotter_save');
+            if (saved) {
+                let s = JSON.parse(saved);
+                player = s.player;
+                if (s.leaderboard) leaderboard = s.leaderboard;
+            }
+        }
+        function saveProgress() {
+            localStorage.setItem('globetrotter_save', JSON.stringify({ player, leaderboard }));
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if (id !== 'login-screen') document.getElementById('hud').style.display = 'flex';
+            sndClick();
+
+            if (id === 'world-map') updateWorldMap();
+            if (id === 'profile-screen') updateProfile();
+        }
+
+        /* === LOGIN === */
+        let selectedAvatar = '🤠';
+        function selectAvatar(el, icon) {
+            document.querySelectorAll('.avatar-select').forEach(a => a.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedAvatar = icon;
+            sndClick();
+        }
+        function login() {
+            initAudio();
+            let name = document.getElementById('player-name').value.trim();
+            if (!name) name = "Explorer";
+
+            // Check if existing player with same name logic, skipping for brevity, overwriting if new locally.
+            loadProgress();
+            if (player.name !== name || player.name === '') {
+                // New or reset
+                player.name = name;
+                player.avatar = selectedAvatar;
+                player.miles = 0;
+                player.completed = {};
+                player.badges = [];
+            } else {
+                // Return user, update avatar
+                player.avatar = selectedAvatar;
+            }
+            saveProgress();
+            updateHud();
+            showScreen('world-map');
+        }
+
+        function updateHud() {
+            document.getElementById('hud-avatar').innerText = player.avatar;
+            document.getElementById('hud-name').innerText = player.name;
+            document.getElementById('hud-miles').innerText = player.miles;
+        }
+
+        function getRank(m) {
+            if (m < 200) return "Tourist";
+            if (m < 500) return "Explorer";
+            if (m < 1000) return "Navigator";
+            return "World Master";
+        }
+
+        function updateProfile() {
+            document.getElementById('prof-avatar').innerText = player.avatar;
+            document.getElementById('prof-name').innerText = player.name;
+            document.getElementById('prof-miles').innerText = player.miles;
+            document.getElementById('prof-rank').innerText = getRank(player.miles);
+
+            // Badges
+            let clears = Object.keys(player.completed).length;
+            if (clears > 0 && !player.badges.includes('first')) player.badges.push('first');
+            if (clears === TOTAL_COUNTRIES && !player.badges.includes('world')) player.badges.push('world');
+            let perfects = Object.values(player.completed).filter(s => s === 3).length;
+            if (perfects >= 5 && !player.badges.includes('master')) player.badges.push('master');
+
+            document.querySelectorAll('.badge').forEach(b => b.classList.remove('earned'));
+            player.badges.forEach(b => {
+                let el = document.getElementById(`badge-${b}`);
+                if (el) el.classList.add('earned');
+            });
+
+            // Leaderboard update
+            let lbCopy = [...leaderboard];
+            if (!lbCopy.find(e => e.name === player.name)) {
+                lbCopy.push({ name: player.name, miles: player.miles });
+            } else {
+                lbCopy.find(e => e.name === player.name).miles = player.miles;
+            }
+            lbCopy.sort((a, b) => b.miles - a.miles);
+            leaderboard = lbCopy.slice(0, 5); // top 5
+            saveProgress();
+
+            let lbHtml = '';
+            leaderboard.forEach((e, i) => {
+                let medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+                lbHtml += `<div class="lb-row"><span>${medal} ${e.name}</span><span>${e.miles} ✈️</span></div>`;
+            });
+            document.getElementById('leaderboard').innerHTML = lbHtml;
+        }
+
+        /* === MAP === */
+        function updateWorldMap() {
+            let clears = Object.keys(player.completed).length;
+            let percent = Math.round((clears / TOTAL_COUNTRIES) * 100);
+            document.getElementById('map-prog-fill').style.width = percent + '%';
+            document.getElementById('map-prog-text').innerText = percent + '%';
+
+            Object.keys(worldData).forEach(contId => {
+                let contEl = document.getElementById(`cont_${contId}`);
+                let req = worldData[contId].unlockReq;
+                if (clears >= req) {
+                    contEl.classList.remove('locked');
+                    let lockText = contEl.querySelector('text[font-size="16"]');
+                    if (lockText) lockText.style.display = 'none';
+                }
+            });
+        }
+
+        let currentContinent = null;
+        function selectContinent(id) {
+            let clears = Object.keys(player.completed).length;
+            if (clears < worldData[id].unlockReq) {
+                sndWrong(); return;
+            }
+            sndClick();
+            currentContinent = worldData[id];
+
+            document.getElementById('cont-title').innerText = currentContinent.name;
+            let grid = document.getElementById('country-grid');
+            grid.innerHTML = '';
+
+            let prvCleared = true; // First level always unlocked
+            currentContinent.countries.forEach((country, index) => {
+                let stars = player.completed[country.id] || 0;
+                let isUnlocked = prvCleared;
+
+                let card = document.createElement('div');
+                card.className = `level-card ${isUnlocked ? 'unlocked' : ''}`;
+
+                let starsHtml = '✩ ✩ ✩';
+                if (stars === 1) starsHtml = '⭐ ✩ ✩';
+                if (stars === 2) starsHtml = '⭐ ⭐ ✩';
+                if (stars === 3) starsHtml = '⭐ ⭐ ⭐';
+
+                card.innerHTML = `
+                    <h2>${country.name}</h2>
+                    <div class="stars-display" style="${!isUnlocked ? 'opacity:0' : ''}">${starsHtml}</div>
+                    <button class="btn-3d ${!isUnlocked ? 'btn-disabled' : ''}" style="width:80%; font-size:1.2rem; padding: 0.8rem;" onclick="playLevel('${country.id}')">
+                        ${isUnlocked ? 'Play' : 'Locked'}
+                    </button>
+                    ${!isUnlocked ? '<div style="position:absolute; top: -10px; right: -10px; font-size: 2rem;">🔒</div>' : ''}
+                `;
+                grid.appendChild(card);
+                if (stars === 0) prvCleared = false; // Next is locked if this isn't cleared
+            });
+            showScreen('country-screen');
+        }
+
+        /* === GAME LOOP === */
+        let currentLevel = null;
+        let gameActive = false;
+        let tLeft = 30;
+        let timerInt = null;
+
+        function playLevel(countryId) {
+            sndClick();
+            currentLevel = currentContinent.countries.find(c => c.id === countryId);
+            document.getElementById('game-country-title').innerText = currentLevel.name;
+            showScreen('game-screen');
+
+            let board = document.getElementById('game-board');
+            board.innerHTML = '';
+
+            tLeft = 30;
+            document.getElementById('game-timer').innerText = tLeft;
+            document.getElementById('game-timer').style.borderColor = '#ef4444';
+            document.getElementById('game-timer').style.color = '#ef4444';
+
+            gameActive = true;
+            clearInterval(timerInt);
+            timerInt = setInterval(() => {
+                if (!gameActive) return;
+                tLeft--;
+                document.getElementById('game-timer').innerText = tLeft;
+                if (tLeft <= 5) playTone(800, 'sine', 0.05, 0.05); // low tick
+                if (tLeft <= 0) {
+                    endLevel(false, 0);
+                }
+            }, 1000);
+
+            // Render Specific Game
+            if (currentLevel.type === GAME_TYPES.FLAG || currentLevel.type === GAME_TYPES.CAPITAL) {
+                let html = `<div class="game-question">${currentLevel.q}</div>`;
+                html += `<div class="grid-4">`;
+                // Shuffle options
+                let opts = [...currentLevel.opts].sort(() => Math.random() - 0.5);
+                opts.forEach(opt => {
+                    let cls = currentLevel.type === GAME_TYPES.FLAG ? '' : 'text-opt';
+                    html += `<button class="opt-btn ${cls}" onclick="checkMCQ(this, '${opt}', '${currentLevel.ans}')">${opt}</button>`;
+                });
+                html += `</div>`;
+                board.innerHTML = html;
+            }
+
+            else if (currentLevel.type === GAME_TYPES.MONUMENT) {
+                board.innerHTML = `<div class="game-question">Match the Monuments!</div>
+                    <div class="match-area" id="match-area">
+                        <div class="drag-col" id="drag-col"></div>
+                        <div class="drop-col" id="drop-col"></div>
+                    </div>`;
+
+                let mons = [...currentLevel.monuments].sort(() => Math.random() - 0.5);
+                let c_opts = [...currentLevel.c_opts].sort(() => Math.random() - 0.5);
+
+                let dragH = '', dropH = '';
+                mons.forEach((m, i) => {
+                    dragH += `<div class="drag-item" data-id="${m}" onpointerdown="startDrag(event, this)">${m}</div>`;
+                });
+                c_opts.forEach((c) => {
+                    dropH += `<div class="drop-zone" data-target="${c}">${c}</div>`;
+                });
+                document.getElementById('drag-col').innerHTML = dragH;
+                document.getElementById('drop-col').innerHTML = dropH;
+                initDragDrop();
+            }
+
+            else if (currentLevel.type === GAME_TYPES.MAP) {
+                board.innerHTML = `<div class="game-question">${currentLevel.q}</div>
+                    ${currentLevel.svg}`;
+
+                // Attach clicks
+                setTimeout(() => {
+                    document.querySelectorAll('.tap-region').forEach(r => {
+                        r.onclick = function () {
+                            if (!gameActive) return;
+                            if (this.id === currentLevel.tgt) {
+                                this.classList.add('correct');
+                                sndCorrect();
+                                setTimeout(() => endLevel(true), 1000);
+                            } else {
+                                this.classList.add('wrong');
+                                sndWrong();
+                            }
+                        };
+                    });
+                }, 50);
+            }
+        }
+
+        /* === MINI GAME LOGIC === */
+        function checkMCQ(btn, guess, answer) {
+            if (!gameActive) return;
+            document.querySelectorAll('.opt-btn').forEach(b => b.style.pointerEvents = 'none');
+            if (guess === answer) {
+                btn.classList.add('correct');
+                sndCorrect();
+                setTimeout(() => endLevel(true), 1000);
+            } else {
+                btn.classList.add('wrong');
+                sndWrong();
+                setTimeout(() => endLevel(false, 0), 1000);
+            }
+        }
+
+        // Pointer Drag Drop 
+        let dItem = null, startX = 0, startY = 0, initX = 0, initY = 0;
+        let matchedCount = 0;
+        function initDragDrop() { matchedCount = 0; }
+
+        function startDrag(e, el) {
+            if (!gameActive || el.classList.contains('matched')) return;
+            dItem = el;
+            let rect = el.getBoundingClientRect();
+            startX = e.clientX; startY = e.clientY;
+            // Get original transform if any
+            let style = window.getComputedStyle(el);
+            let matrix = new DOMMatrixReadOnly(style.transform);
+            initX = matrix.m41; initY = matrix.m42;
+
+            el.setPointerCapture(e.pointerId);
+            el.style.zIndex = 1000;
+            el.onpointermove = moveDrag;
+            el.onpointerup = endDrag;
+            sndClick();
+        }
+        function moveDrag(e) {
+            if (!dItem) return;
+            let dx = e.clientX - startX; let dy = e.clientY - startY;
+            dItem.style.transform = `translate(${initX + dx}px, ${initY + dy}px)`;
+        }
+        function endDrag(e) {
+            if (!dItem) return;
+            dItem.onpointermove = null; dItem.onpointerup = null;
+            dItem.releasePointerCapture(e.pointerId);
+            dItem.style.zIndex = 100;
+
+            // Check collision with drop zones
+            let rect = dItem.getBoundingClientRect();
+            let drops = document.querySelectorAll('.drop-zone:not(.matched)');
+            let droppedOn = null;
+
+            drops.forEach(z => {
+                let zr = z.getBoundingClientRect();
+                if (rect.left < zr.right && rect.right > zr.left && rect.top < zr.bottom && rect.bottom > zr.top) {
+                    droppedOn = z;
+                }
+            });
+
+            if (droppedOn) {
+                let mId = dItem.getAttribute('data-id');
+                let tId = droppedOn.getAttribute('data-target');
+                if (currentLevel.matches[mId] === tId) {
+                    // Correct!
+                    sndCorrect();
+                    dItem.style.display = 'none'; // hide Dragger
+                    droppedOn.innerHTML = `${tId} <br><span style="color:var(--btn-pink-shade); font-size:0.8em; font-weight:900;">✔ ${mId}</span>`;
+                    droppedOn.classList.add('matched');
+                    matchedCount++;
+                    if (matchedCount === Object.keys(currentLevel.matches).length) {
+                        setTimeout(() => endLevel(true), 500);
+                    }
+                } else {
+                    // Wrong
+                    sndWrong();
+                    dItem.style.transform = `translate(0px, 0px) scale(1)`; // snap back
+                }
+            } else {
+                dItem.style.transform = `translate(0px, 0px) scale(1)`; // snap back
+            }
+            dItem = null;
+        }
+
+        /* === RESULTS === */
+        function endLevel(win) {
+            gameActive = false;
+            clearInterval(timerInt);
+
+            let ov = document.getElementById('result-overlay');
+            let tt = document.getElementById('result-title');
+            let ds = document.getElementById('result-stars');
+            let ms = document.getElementById('result-miles');
+
+            ov.style.display = 'flex';
+
+            if (win) {
+                sndWin();
+                tt.innerText = "Level Cleared!";
+                tt.style.color = "var(--btn-green)";
+
+                let stars = 3;
+                if (tLeft < 20) stars = 2;
+                if (tLeft < 10) stars = 1;
+
+                let sHtml = '';
+                for (let i = 0; i < 3; i++) sHtml += `<span class="${i < stars ? 'star-earned' : ''}">${i < stars ? '★' : '☆'}</span> `;
+                ds.innerHTML = sHtml;
+
+                let milesGained = stars * 50;
+                ms.innerText = milesGained;
+
+                // Update Player
+                player.miles += milesGained;
+
+                // System-wide QRIO Point Sync
+                if (window.localStorage) {
+                    let activeId = localStorage.getItem('qrio_active_id');
+                    if (activeId) {
+                        fetch('http://localhost:5000/api/points', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ userId: activeId, pointsToAdd: milesGained })
+                        }).catch(console.error);
+                    }
+                }
+
+                let prvStars = player.completed[currentLevel.id] || 0;
+                if (stars > prvStars) player.completed[currentLevel.id] = stars;
+
+                updateHud();
+                saveProgress();
+                fireConfetti();
+            } else {
+                tt.innerText = "Time's Up! / Wrong!";
+                tt.style.color = "#ef4444";
+                ds.innerHTML = `<span style="color:#ef4444">❌ ❌ ❌</span>`;
+                ms.innerText = "0";
+            }
+        }
+
+        function closeResultAndBackToMap() {
+            sndClick();
+            document.getElementById('result-overlay').style.display = 'none';
+            // Stop confetti
+            particles = [];
+            // Auto return to continent screen to see unlock, but update map entirely just in case
+            selectContinent(currentContinent.id);
+            updateHud();
+        }
+
+        /* === CONFETTI ENGINE === */
+        const cCanvas = document.getElementById('confetti-canvas');
+        const cCtx = cCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeC() {
+            cCanvas.width = window.innerWidth;
+            cCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeC);
+        resizeC();
+
+        function fireConfetti() {
+            particles = [];
+            let colors = ['#facc15', '#4ade80', '#38bdf8', '#f472b6', '#a78bfa'];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: cCanvas.width / 2, y: cCanvas.height / 2,
+                    vx: (Math.random() - 0.5) * 20, vy: (Math.random() - 1) * 20,
+                    size: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+            requestAnimationFrame(renderC);
+        }
+
+        function renderC() {
+            if (particles.length === 0) return;
+            cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.vy += 0.5; // gravity
+                p.x += p.vx; p.y += p.vy; p.rot += p.rotSpeed;
+
+                cCtx.save();
+                cCtx.translate(p.x, p.y);
+                cCtx.rotate(p.rot * Math.PI / 180);
+                cCtx.fillStyle = p.color;
+                cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                cCtx.restore();
+
+                if (p.y > cCanvas.height) particles.splice(i, 1);
+            }
+            requestAnimationFrame(renderC);
+        }
+
+        // Init
+        loadProgress();
+    </script>
+</body>
+
+</html>

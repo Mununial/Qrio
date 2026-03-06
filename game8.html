@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civics City Builder - QRIO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        body {
+            margin: 0;
+            background: #fef3c7;
+            color: #78350f;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #fde68a;
+        }
+
+        .hud {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat h3 {
+            color: #b45309;
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .stat p {
+            margin: 5px 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #92400e;
+        }
+
+        .btn-exit {
+            background: transparent;
+            color: #b45309;
+            border: 2px solid #b45309;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Outfit';
+        }
+
+        .btn-exit:hover {
+            background: #b45309;
+            color: white;
+        }
+
+        .game-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .city-bg {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><path d="M0,200 L0,100 L50,100 L50,80 L100,80 L100,120 L200,120 L200,50 L300,50 L300,150 L400,150 L400,90 L500,90 L500,40 L600,40 L600,110 L700,110 L700,60 L800,60 L800,130 L900,130 L900,70 L1000,70 L1000,200 Z" fill="%23fde68a"/></svg>') repeat-x;
+            background-size: contain;
+            z-index: -1;
+            animation: drift 40s linear infinite;
+        }
+
+        @keyframes drift {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: -1000px 0;
+            }
+        }
+
+        .event-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(120, 53, 15, 0.1);
+            text-align: center;
+            max-width: 500px;
+            z-index: 10;
+            border: 2px solid #fde68a;
+        }
+
+        .event-card h2 {
+            margin-top: 0;
+            font-size: 2rem;
+            color: #92400e;
+        }
+
+        .event-card p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .decisions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .btn-decision {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit';
+            flex: 1;
+        }
+
+        .btn-yes {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-yes:hover {
+            background: #059669;
+            transform: translateY(-3px);
+        }
+
+        .btn-no {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-no:hover {
+            background: #dc2626;
+            transform: translateY(-3px);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(254, 243, 199, 0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-over h1 {
+            color: #dc2626;
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .game-over p {
+            color: #92400e;
+            font-size: 1.5rem;
+        }
+
+        .btn-restart {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div style="font-weight: 900; font-size: 1.5rem;"><i class="fa-solid fa-landmark-dome"></i> Civics City Builder
+        </div>
+        <div class="hud">
+            <div class="stat">
+                <h3>Happiness</h3>
+                <p id="stat-happy">100%</p>
+            </div>
+            <div class="stat">
+                <h3>Treasury</h3>
+                <p id="stat-funds">$500</p>
+            </div>
+            <div class="stat">
+                <h3>Turn</h3>
+                <p id="stat-turn">1</p>
+            </div>
+            <div class="stat">
+                <h3>Score</h3>
+                <p id="stat-score" style="color:#d97706;">0 px</p>
+            </div>
+        </div>
+        <button class="btn-exit" onclick="window.close()">Exit City</button>
+    </nav>
+
+    <div class="game-area">
+        <div class="city-bg"></div>
+        <div class="event-card" id="eventCard">
+            <h2 id="eventTitle">Welcome Mayor!</h2>
+            <p id="eventDesc">A corporation wants to build a factory. It will generate revenue but decrease citizen
+                happiness due to pollution. Approve?</p>
+            <div class="decisions">
+                <button class="btn-decision btn-no" onclick="makeDecision(false)">Reject</button>
+                <button class="btn-decision btn-yes" onclick="makeDecision(true)">Approve</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOverScreen">
+        <h1 id="goTitle">Term Ended</h1>
+        <p id="goReason">You ran out of funds or the city rioted.</p>
+        <p id="goScore" style="font-weight:bold; font-size:2rem; color:#d97706;">Final Score: 0 px</p>
+        <button class="btn-restart" onclick="location.reload()">Start New Term</button>
+    </div>
+
+    <script>
+        let happiness = 100;
+        let funds = 500;
+        let turn = 1;
+        let score = 0;
+
+        const events = [
+            { title: "Public Park", desc: "Citizens requested a new public park. Cost: $150. Happiness +20%.", cost: 150, hBoost: 20, revenue: 0, hPenalty: 0 },
+            { title: "Tax Increase", desc: "Propose a city tax increase to raise funds. Revenue: $200. Happiness -15%.", cost: 0, hBoost: 0, revenue: 200, hPenalty: 15 },
+            { title: "Education Grant", desc: "Fund a new school. Cost: $200. Happiness +30%.", cost: 200, hBoost: 30, revenue: 0, hPenalty: 0 },
+            { title: "Industrial Zone", desc: "Allow a new heavy-industry zone. Revenue: $300. Happiness -25%.", cost: 0, hBoost: 0, revenue: 300, hPenalty: 25 },
+            { title: "City Festival", desc: "Host an annual festival. Cost: $100. Happiness +25%.", cost: 100, hBoost: 25, revenue: 0, hPenalty: 0 },
+            { title: "Cut Services", desc: "Reduce public services to save money. Revenue: $150. Happiness -20%.", cost: 0, hBoost: 0, revenue: 150, hPenalty: 20 }
+        ];
+
+        let currentEvent = events[0];
+
+        function updateUI() {
+            document.getElementById('stat-happy').innerText = happiness + "%";
+            document.getElementById('stat-funds').innerText = "$" + funds;
+            document.getElementById('stat-turn').innerText = turn;
+            document.getElementById('stat-score').innerText = score + " px";
+
+            if (happiness <= 0) {
+                gameOver("City Riots!", "Happiness reached 0%. The citizens forced you to resign.");
+            } else if (funds < 0) {
+                gameOver("Bankrupt!", "The city ran out of money. You've been removed from office.");
+            }
+        }
+
+        function spawnEvent() {
+            currentEvent = events[Math.floor(Math.random() * events.length)];
+            document.getElementById('eventTitle').innerText = currentEvent.title;
+            document.getElementById('eventDesc').innerText = currentEvent.desc;
+        }
+
+        function awardPoints(amount) {
+            score += amount;
+            let activeId = localStorage.getItem('QRIO_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: amount })
+                }).catch(console.error);
+            }
+        }
+
+        function makeDecision(approved) {
+            if (approved) {
+                funds += currentEvent.revenue;
+                funds -= currentEvent.cost;
+                happiness += currentEvent.hBoost;
+                happiness -= currentEvent.hPenalty;
+            } else {
+                // If rejected, slight happiness penalty for doing nothing, or neutral
+                happiness -= 5;
+            }
+
+            if (happiness > 100) happiness = 100;
+
+            turn++;
+            awardPoints(15); // Points for surviving a turn
+            updateUI();
+
+            if (happiness > 0 && funds >= 0) {
+                spawnEvent();
+            }
+        }
+
+        function gameOver(title, reason) {
+            document.getElementById('eventCard').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'flex';
+            document.getElementById('goTitle').innerText = title;
+            document.getElementById('goReason').innerText = reason;
+            document.getElementById('goScore').innerText = `Final Score: ${score} px`;
+        }
+
+        spawnEvent();
+        updateUI();
+    </script>
+</body>
+
+</html>

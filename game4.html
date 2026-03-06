@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Security World - SkillVerse</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Inter:wght@400;700;900&display=swap');
+
+        body {
+            margin: 0;
+            background-color: #020617;
+            color: #10b981;
+            font-family: 'Fira Code', monospace;
+            overflow: hidden;
+        }
+
+        #canvas-bg {
+            position: absolute;
+            z-index: -1;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .hud {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            text-align: right;
+        }
+
+        .hud h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: #34d399;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 100px auto;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #059669;
+            padding: 40px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);
+        }
+
+        button {
+            background: #10b981;
+            color: #020617;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px;
+            font-family: 'Fira Code';
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+
+        input {
+            background: #020617;
+            border: 1px solid #10b981;
+            color: #34d399;
+            padding: 15px;
+            font-size: 1.2rem;
+            width: 80%;
+            border-radius: 8px;
+            font-family: 'Fira Code';
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        .phishing-card {
+            background: #1e293b;
+            border-left: 5px solid #ef4444;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            color: white;
+            display: none;
+        }
+
+        .phishing-card.active {
+            display: block;
+        }
+
+        .sender {
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(2, 6, 23, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            display: none;
+        }
+
+        .game-over h1 {
+            color: #ef4444;
+            font-size: 4rem;
+            text-transform: uppercase;
+            margin-bottom: 0;
+        }
+
+        .game-over p {
+            color: #94a3b8;
+            font-size: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            nav { padding: 15px; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
+            .container { margin: 20px 10px; padding: 25px; width: auto; }
+            .container h1 { font-size: 1.5rem; }
+            .hud { top: auto; bottom: 80px; right: 10px; text-align: center; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+            .hud h2 { font-size: 1.5rem; }
+            input { width: 100%; box-sizing: border-box; }
+            button { width: 100%; margin: 5px 0; }
+            .game-over h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div style="font-weight: 900; font-size: 1.5rem;"><i class="fa-solid fa-cube"></i> SkillVerse • Cyber Security
+        </div>
+        <button onclick="window.close()" style="margin:0; padding: 10px 20px; font-size: 1rem;">Back to Hub</button>
+    </nav>
+    <div class="hud">
+        <p>System XP</p>
+        <h2 id="scoreDisplay">0 px</h2>
+    </div>
+
+    <div class="container" id="mainMenu">
+        <h1>Welcome to Cyber City Server Interface</h1>
+        <p>Your mission: Secure the mainframe and detect inbound threats.</p>
+        <button onclick="startPassword()">Mission 1: Password Builder</button>
+        <button onclick="startPhishing()">Mission 2: Phishing Detector</button>
+    </div>
+
+    <div class="container" id="passMission" style="display:none;">
+        <h2>Password Defense Matrix</h2>
+        <p>Create a password containing: 8+ chars, 1 uppercase, 1 number, 1 symbol (!@#$).</p>
+        <input type="text" id="passInput" placeholder="Enter secure password...">
+        <br><button onclick="checkPassword()">Test Strength</button>
+        <br><button onclick="mainMenu()">Cancel</button>
+    </div>
+
+    <div class="container" id="phishMission" style="display:none;">
+        <h2>Phishing Sweep</h2>
+        <p>Identify which of these incoming emails is a Phishing attempt.</p>
+
+        <div class="phishing-card active" id="email1">
+            <div class="sender">From: security@paypal-login-update.com</div>
+            <h3>URGENT: Your account is restricted!</h3>
+            <p>Please click here immediately to update your billing details or your account will be deleted.</p>
+            <button onclick="checkPhish(true, 'email1')">Flag as Phishing</button>
+            <button onclick="checkPhish(false, 'email1')">Mark Safe</button>
+        </div>
+
+        <div class="phishing-card" id="email2">
+            <div class="sender">From: hr@QRIO-wonder.net</div>
+            <h3>Quarterly Team Meeting</h3>
+            <p>Hey team, just a reminder that our quarterly check-in is tomorrow at 10 AM. See you there!</p>
+            <button onclick="checkPhish(true, 'email2')">Flag as Phishing</button>
+            <button onclick="checkPhish(false, 'email2')">Mark Safe</button>
+        </div>
+
+        <br><button onclick="mainMenu()">Cancel</button>
+    </div>
+
+    <div class="game-over" id="gameOverScreen">
+        <h1 id="gameOverTitle">SYSTEM COMPROMISED</h1>
+        <p id="gameOverSub">A threat penetrated the firewall.</p>
+        <button onclick="location.reload()">Reboot System</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let score = 0;
+        let attempts = 3;
+
+        function showGameOver(title, sub) {
+            document.getElementById('gameOverTitle').innerText = title;
+            document.getElementById('gameOverSub').innerText = sub;
+            document.getElementById('gameOverScreen').style.display = 'flex';
+        }
+
+        function updatePoints(amount) {
+            score += amount;
+            document.getElementById('scoreDisplay').innerText = score + " px";
+            alert("Firewall Reinforced! +50 XP");
+
+            // Sync with QRIO Backend
+            let activeId = localStorage.getItem('qrio_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: amount })
+                }).catch(console.error);
+            }
+        }
+
+        function mainMenu() {
+            document.getElementById('mainMenu').style.display = 'block';
+            document.getElementById('passMission').style.display = 'none';
+            document.getElementById('phishMission').style.display = 'none';
+        }
+
+        function startPassword() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('passMission').style.display = 'block';
+        }
+
+        function checkPassword() {
+            const pwd = document.getElementById('passInput').value;
+            const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$])[A-Za-z\d!@#\$]{8,}$/;
+            if (regex.test(pwd)) {
+                updatePoints(50);
+                mainMenu();
+            } else {
+                attempts--;
+                if (attempts <= 0) {
+                    showGameOver('SYSTEM LOCKOUT', 'Too many failed login attempts.');
+                } else {
+                    alert(`ACCESS DENIED: Password too weak. ${attempts} attempts remaining.`);
+                }
+            }
+        }
+
+        function startPhishing() {
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('phishMission').style.display = 'block';
+        }
+
+        function checkPhish(isPhish, emailId) {
+            if (emailId === 'email1' && isPhish) {
+                updatePoints(50);
+                document.getElementById('email1').classList.remove('active');
+                document.getElementById('email2').classList.add('active');
+            } else if (emailId === 'email2' && !isPhish) {
+                updatePoints(50);
+                alert("Sector Cleared. Returning to Main menu.");
+                mainMenu();
+            } else {
+                showGameOver('SYSTEM COMPROMISED', 'You triggered a malicious payload.');
+            }
+        }
+
+        // Minimalist Three.js Matrix-like BG
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020617, 0.002);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.id = 'canvas-bg';
+        document.body.prepend(renderer.domElement);
+
+        const geometry = new THREE.BufferGeometry();
+        const vertices = [];
+        for (let i = 0; i < 10000; i++) {
+            vertices.push(
+                THREE.MathUtils.randFloatSpread(2000),
+                THREE.MathUtils.randFloatSpread(2000),
+                THREE.MathUtils.randFloatSpread(2000)
+            );
+        }
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        const material = new THREE.PointsMaterial({ color: 0x10b981, size: 2 });
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+        camera.position.z = 1000;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            particles.rotation.x += 0.0001;
+            particles.rotation.y += 0.001;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+
+</html>

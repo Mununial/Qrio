@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Wellness World - SkillVerse</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            transition: background 4s ease-in-out;
+        }
+
+        nav {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            box-sizing: border-box;
+            padding: 20px 40px;
+        }
+
+        .btn-exit {
+            background: transparent;
+            color: #0284c7;
+            border: 2px solid #0284c7;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Quicksand';
+        }
+
+        .btn-exit:hover {
+            background: #0284c7;
+            color: white;
+        }
+
+        .hud {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .circle-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breathe-circle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(14, 165, 233, 0.2);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(14, 165, 233, 0.5);
+            animation: breathe 8s infinite ease-in-out;
+        }
+
+        .center-dot {
+            width: 20px;
+            height: 20px;
+            background: #0284c7;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: 0 0 20px #0284c7;
+        }
+
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            40% {
+                transform: scale(3);
+                opacity: 0.3;
+            }
+
+            /* Inhale */
+            50% {
+                transform: scale(3);
+                opacity: 0.3;
+            }
+
+            /* Hold */
+            90% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            /* Exhale */
+            100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            /* Hold empty */
+        }
+
+        h1 {
+            margin-top: 50px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .instruction {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #f0fdf4;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            display: none;
+        }
+
+        .game-over h1 {
+            color: #166534;
+            font-size: 3rem;
+            margin-bottom: 0;
+        }
+
+        .game-over p {
+            color: #15803d;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div style="font-weight: bold; font-size: 1.5rem;"><i class="fa-solid fa-leaf"></i> SkillVerse • Mental Wellness
+        </div>
+        <div class="hud" id="hud">Zen Points: 0</div>
+        <button class="btn-exit" onclick="window.close()">Return to Center</button>
+    </nav>
+
+    <div class="circle-container">
+        <div class="breathe-circle"></div>
+        <div class="center-dot"></div>
+    </div>
+
+    <h1 id="breatheText">Breathe in...</h1>
+    <p class="instruction">Sync your breathing with the circle to earn Zen Points.</p>
+
+    <div class="game-over" id="gameOverScreen">
+        <h1>Session Complete</h1>
+        <p id="finalScoreText">You earned 0 Zen Points.</p>
+        <button class="btn-exit" style="margin-top:20px;" onclick="location.reload()">Restart Session</button>
+    </div>
+
+    <script>
+        let score = 0;
+        let cycles = 0;
+        const maxCycles = 5;
+        const textElement = document.getElementById('breatheText');
+        const body = document.body;
+
+        // Sync text with CSS 8-second animation
+        let sessionInterval = setInterval(() => {
+            if (cycles >= maxCycles) {
+                document.getElementById('finalScoreText').innerText = `You earned ${score} Zen Points.`;
+                document.getElementById('gameOverScreen').style.display = 'flex';
+                clearInterval(sessionInterval);
+                return;
+            }
+            cycles++;
+
+            textElement.innerText = "Breathe in...";
+            body.style.background = "#e0f2fe"; // Light blue
+
+            setTimeout(() => {
+                textElement.innerText = "Hold...";
+
+            }, 3200); // 40% of 8s
+
+            setTimeout(() => {
+                textElement.innerText = "Breathe out...";
+                body.style.background = "#f0fdf4"; // Light green
+
+                // Award points implicitly for staying in the wellness app
+                score += 5;
+                document.getElementById('hud').innerText = "Zen Points: " + score;
+
+                let activeId = localStorage.getItem('QRIO_active_id');
+                if (activeId) {
+                    fetch('http://localhost:5000/api/points', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: activeId, pointsToAdd: 5 })
+                    }).catch(console.error);
+                }
+
+            }, 4000); // 50% of 8s
+
+            setTimeout(() => {
+                textElement.innerText = "Rest.";
+            }, 7200); // 90% of 8s
+
+        }, 8000);
+    </script>
+</body>
+
+</html>

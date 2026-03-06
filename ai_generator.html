@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content to Game Generator - Qrio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --text: #f8fafc;
+            --primary: #c026d3;
+            --secondary: #3b82f6;
+            --accent: #f472b6;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hud {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .coin-badge {
+            background: #334155;
+            color: #fbbf24;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #475569;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin: 0 0 10px 0;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin: 0;
+        }
+
+        .generator-card {
+            background: var(--panel);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .upload-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .upload-tab {
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'Outfit';
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 10px;
+        }
+
+        .upload-tab:hover {
+            color: var(--text);
+            background: #334155;
+        }
+
+        .upload-tab.active {
+            color: white;
+            background: var(--primary);
+        }
+
+        .input-section {
+            display: none;
+        }
+
+        .input-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .drop-zone {
+            border: 2px dashed #475569;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(192, 38, 211, 0.1);
+        }
+
+        .drop-zone i {
+            font-size: 4rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .drop-zone p {
+            margin: 0;
+            color: #94a3b8;
+        }
+
+        .link-input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 1.2rem;
+            font-family: 'Outfit';
+            box-sizing: border-box;
+        }
+
+        .link-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-generate {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            font-family: 'Outfit';
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(192, 38, 211, 0.3);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loader */
+        .loader-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+        }
+
+        .loader-orb {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            animation: pulse 1.5s infinite, spin 2s linear infinite;
+            box-shadow: 0 0 40px var(--primary);
+        }
+
+        .loader-text {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .loader-steps {
+            margin-top: 15px;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                box-shadow: 0 0 20px var(--primary);
+            }
+
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 60px var(--accent);
+            }
+
+            100% {
+                transform: scale(0.9);
+                box-shadow: 0 0 20px var(--primary);
+            }
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Game Output */
+        .game-output {
+            display: none;
+            background: #0f172a;
+            border-radius: 15px;
+            border: 1px solid #475569;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .game-header {
+            background: #1e293b;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .game-header h3 {
+            margin: 0;
+            color: #e2e8f0;
+        }
+
+        .game-frame {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .generated-mission {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #3b82f6;
+            margin-bottom: 20px;
+        }
+
+        .generated-mission h2 {
+            color: #60a5fa;
+            margin-top: 0;
+        }
+
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn-answer {
+            background: #334155;
+            color: white;
+            border: 1px solid #475569;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit';
+        }
+
+        .btn-answer:hover {
+            background: #475569;
+        }
+
+        .btn-answer.correct {
+            background: #10b981;
+            border-color: #059669;
+        }
+
+        .win-shield {
+            color: #facc15;
+            font-size: 4rem;
+            display: none;
+            margin-top: 20px;
+            animation: bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: scale(0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo" style="display:flex; align-items:center; gap:10px;">
+            <img src="logo.png" alt="Qrio Logo" style="height: 35px; width: auto; border-radius: 6px;">
+            <span
+                style="background: linear-gradient(90deg, var(--accent), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI
+                Generator</span>
+        </div>
+        <div class="hud">
+            <div class="coin-badge"><i class="fa-solid fa-coins"></i> <span id="coinDisplay">0</span></div>
+            <button onclick="window.close()"
+                style="background:transparent; color:#94a3b8; border:1px solid #475569; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold; font-family:'Outfit'">Close
+                Tool</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>Content-to-Game AI</h1>
+            <p>Paste a YouTube link or drop a file to automatically generate an educational game.</p>
+        </div>
+
+        <div class="generator-card" id="inputContainer">
+            <div class="upload-tabs">
+                <button class="upload-tab active" onclick="switchInput('yt')"><i class="fa-brands fa-youtube"></i>
+                    YouTube Link</button>
+                <button class="upload-tab" onclick="switchInput('pdf')"><i class="fa-solid fa-file-pdf"></i> Upload
+                    PDF</button>
+                <button class="upload-tab" onclick="switchInput('vid')"><i class="fa-solid fa-video"></i> Upload
+                    Video</button>
+            </div>
+
+            <div class="input-section active" id="sec-yt">
+                <input type="text" class="link-input" placeholder="e.g. https://youtube.com/watch?v=..." id="ytInput">
+            </div>
+
+            <div class="input-section" id="sec-pdf">
+                <div class="drop-zone" id="dz-pdf">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <h3>Drag & Drop PDF Here</h3>
+                    <p>or click to browse files</p>
+                </div>
+            </div>
+
+            <div class="input-section" id="sec-vid">
+                <div class="drop-zone" id="dz-vid">
+                    <i class="fa-solid fa-film"></i>
+                    <h3>Drag & Drop Video Here</h3>
+                    <p>MP4, WebM formats supported</p>
+                </div>
+            </div>
+
+            <button class="btn-generate" id="btnGen" onclick="startGeneration()">
+                <i class="fa-solid fa-bolt"></i> Generate Game
+            </button>
+        </div>
+
+        <!-- Loader -->
+        <div class="loader-container" id="loader">
+            <div class="loader-orb"></div>
+            <div class="loader-text" id="loaderText">Analyzing Content...</div>
+            <div class="loader-steps" id="loaderSteps">Extracting key topics using Gemini API...</div>
+        </div>
+
+        <!-- Generated Game Output -->
+        <div class="game-output" id="outputGame">
+            <div class="game-header">
+                <h3><i class="fa-solid fa-gamepad"></i> Generated Mission</h3>
+                <span
+                    style="background: #10b981; color: #022c22; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">Interactive
+                    Quiz</span>
+            </div>
+
+            <div class="game-frame" id="gameFrame">
+                <div class="generated-mission">
+                    <h2>Mission 1: Core Concept Mastery</h2>
+                    <p style="font-size: 1.2rem; color: #cbd5e1;">Based on the uploaded material, identify the primary
+                        topic discussed in the overview.</p>
+
+                    <div class="answer-grid">
+                        <button class="btn-answer" onclick="wrongAnswer(this)">Secondary Data</button>
+                        <button class="btn-answer" onclick="correctAnswer(this)">Primary Objective</button>
+                        <button class="btn-answer" onclick="wrongAnswer(this)">Historical Context</button>
+                        <button class="btn-answer" onclick="wrongAnswer(this)">Irrelevant Info</button>
+                    </div>
+                </div>
+
+                <div class="win-shield" id="winBadge"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3 id="winText" style="display:none; color: #10b981;">Mission Completed! +100 XP & Coins</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Points sync
+        function refreshPoints() {
+            let activeId = localStorage.getItem('qrio_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points/' + activeId)
+                    .then(r => r.json())
+                    .then(data => {
+                        document.getElementById('coinDisplay').innerText = data.points || 0;
+                    }).catch(e => console.log(e));
+            }
+        }
+        setInterval(refreshPoints, 2000);
+        refreshPoints();
+
+        // UI Logic
+        function switchInput(mode) {
+            document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.input-section').forEach(s => s.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            document.getElementById('sec-' + mode).classList.add('active');
+        }
+
+        // Dropzone interactions via clicks for demo
+        document.getElementById('dz-pdf').addEventListener('click', function () {
+            this.style.borderColor = '#c026d3';
+            this.style.background = 'rgba(192, 38, 211, 0.1)';
+            this.querySelector('h3').innerText = 'chapter_1_science.pdf Selected';
+        });
+
+        document.getElementById('dz-vid').addEventListener('click', function () {
+            this.style.borderColor = '#c026d3';
+            this.style.background = 'rgba(192, 38, 211, 0.1)';
+            this.querySelector('h3').innerText = 'lecture_recording.mp4 Selected';
+        });
+
+        function startGeneration() {
+            document.getElementById('inputContainer').style.display = 'none';
+            document.getElementById('loader').style.display = 'flex';
+
+            // Simulating AI Pipeline steps
+            const steps = [
+                "Parsing data with text-extraction pipeline...",
+                "Running Semantic Analysis via LLM...",
+                "Identifying core entities and relationships...",
+                "Structuring Question Graph...",
+                "Assembling Interactive Game Elements...",
+                "Finalizing Payload..."
+            ];
+
+            let i = 0;
+            const stepInterval = setInterval(() => {
+                if (i < steps.length) {
+                    document.getElementById('loaderSteps').innerText = steps[i];
+                    i++;
+                } else {
+                    clearInterval(stepInterval);
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('outputGame').style.display = 'block';
+                }
+            }, 1000); // 6 seconds total simulate processing
+        }
+
+        function wrongAnswer(btn) {
+            btn.style.background = '#7f1d1d';
+            btn.style.borderColor = '#991b1b';
+            setTimeout(() => {
+                btn.style.background = '#334155';
+                btn.style.borderColor = '#475569';
+            }, 500);
+        }
+
+        function correctAnswer(btn) {
+            btn.classList.add('correct');
+            document.querySelectorAll('.btn-answer').forEach(b => b.disabled = true);
+
+            setTimeout(() => {
+                document.getElementById('winBadge').style.display = 'block';
+                document.getElementById('winText').style.display = 'block';
+
+                // Award massive points to DB
+                let activeId = localStorage.getItem('qrio_active_id');
+                if (activeId) {
+                    fetch('http://localhost:5000/api/points', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: activeId, pointsToAdd: 100 })
+                    }).catch(console.error);
+                }
+            }, 500);
+        }
+    </script>
+</body>
+
+</html>

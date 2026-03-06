@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="or">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition in Plants - BSE Odisha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #ecfdf5;
+            overflow: hidden;
+            font-family: 'Mukta Malar', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #065f46;
+            border-bottom: 3px solid #6ee7b7;
+        }
+
+        #gameCanvas {
+            flex: 1;
+            background: linear-gradient(to bottom, #bae6fd 0%, #34d399 100%);
+            width: 100%;
+            display: block;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(236, 253, 245, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .overlay h1 {
+            font-size: 3rem;
+            color: #047857;
+            margin: 0;
+        }
+
+        .overlay p {
+            font-size: 1.5rem;
+            color: #065f46;
+        }
+
+        .btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+            font-family: 'Mukta Malar';
+        }
+
+        .btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hud">
+        <div><span id="sunCount">0</span> ☀️ ସୂର୍ଯ୍ୟାଲୋକ (Sunlight)</div>
+        <div><span id="waterCount">0</span> 💧 ଜଳ (Water)</div>
+        <div><span id="rockCount">0</span> 🪨 ପୋଷକ (Nutrients)</div>
+        <button onclick="window.close()"
+            style="background:transparent; border:2px solid #059669; color:#059669; padding:5px 15px; border-radius:20px; font-family:'Mukta Malar'; cursor:pointer; font-weight:bold;">ବନ୍ଦ
+            କରନ୍ତୁ (Exit)</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="overlay" id="startScreen">
+        <h1>ଉଦ୍ଭିଦରେ ପୋଷଣ</h1>
+        <p>Catch 10 Sunlight, 10 Water, and 10 Nutrients to grow the plant!</p>
+        <p style="font-size:1rem; opacity:0.8;">Use Left/Right Arrows or touch sides of screen to move</p>
+        <button class="btn" onclick="startGame()">ଖେଳ ଆରମ୍ଭ (Start Game)</button>
+    </div>
+
+    <div class="overlay" id="endScreen" style="display:none;">
+        <h1>ଅଭିନନ୍ଦନ! (Congratulations!)</h1>
+        <p>ଆପଣ ଉଦ୍ଭିଦକୁ ବଢାଇଛନ୍ତି! ଗଛ ବଞ୍ଚିଗଲା।</p>
+        <p style="color: #d97706; font-size: 2rem;">+50 Points Earned!</p>
+        <button class="btn" onclick="window.close()">ଫେରିଯାଆନ୍ତୁ (Return)</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        let items = [];
+        let player = { x: 0, y: 0, width: 80, height: 80, speed: 10 };
+        let scores = { sun: 0, water: 0, rock: 0 };
+        const emojis = { sun: '☀️', water: '💧', rock: '🪨' };
+
+        let gameLoop;
+        let isPlaying = false;
+        let keys = { ArrowLeft: false, ArrowRight: false };
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight - document.querySelector('.hud').offsetHeight;
+            player.x = width / 2 - player.width / 2;
+            player.y = height - player.height - 20;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('keydown', e => { if (keys.hasOwnProperty(e.code)) keys[e.code] = true; });
+        window.addEventListener('keyup', e => { if (keys.hasOwnProperty(e.code)) keys[e.code] = false; });
+
+        // Touch support
+        window.addEventListener('touchstart', e => {
+            const touchX = e.touches[0].clientX;
+            if (touchX < width / 2) { keys.ArrowLeft = true; keys.ArrowRight = false; }
+            else { keys.ArrowRight = true; keys.ArrowLeft = false; }
+        });
+        window.addEventListener('touchend', e => { keys.ArrowLeft = false; keys.ArrowRight = false; });
+
+        function spawnItem() {
+            if (!isPlaying) return;
+            const types = ['sun', 'water', 'rock'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            items.push({
+                x: Math.random() * (width - 40),
+                y: -40,
+                type: type,
+                speed: Math.random() * 3 + 2
+            });
+            setTimeout(spawnItem, Math.random() * 1000 + 500);
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            if (keys.ArrowLeft && player.x > 0) player.x -= player.speed;
+            if (keys.ArrowRight && player.x < width - player.width) player.x += player.speed;
+
+            for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                item.y += item.speed;
+
+                // Collision
+                if (item.y + 40 > player.y && item.x + 40 > player.x && item.x < player.x + player.width) {
+                    scores[item.type]++;
+                    document.getElementById(item.type + "Count").innerText = scores[item.type];
+                    items.splice(i, 1);
+                    checkWin();
+                } else if (item.y > height) {
+                    items.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw Player Basket/Plant root
+            ctx.fillStyle = '#854d0e';
+            ctx.beginPath();
+            ctx.roundRect(player.x, player.y, player.width, player.height, [10, 10, 40, 40]);
+            ctx.fill();
+
+            // Draw plant sprout 
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(player.x + 35, player.y - 30, 10, 30);
+            ctx.beginPath(); ctx.arc(player.x + 40, player.y - 30, 20, 0, Math.PI); ctx.fill();
+
+            // Draw Items
+            ctx.font = '30px Arial';
+            items.forEach(item => {
+                ctx.fillText(emojis[item.type], item.x, item.y);
+            });
+        }
+
+        function loop() {
+            update();
+            draw();
+            if (isPlaying) requestAnimationFrame(loop);
+        }
+
+        function checkWin() {
+            if (scores.sun >= 10 && scores.water >= 10 && scores.rock >= 10) {
+                isPlaying = false;
+                document.getElementById('endScreen').style.display = 'flex';
+
+                // Award points
+                let activeId = localStorage.getItem('QRIO_active_id');
+                if (activeId) {
+                    fetch('http://localhost:5000/api/points', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: activeId, pointsToAdd: 50 })
+                    }).catch(console.error);
+                }
+            }
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            isPlaying = true;
+            spawnItem();
+            loop();
+        }
+    </script>
+</body>
+
+</html>

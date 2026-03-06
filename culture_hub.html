@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Culture Game Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #ea580c;
+            --primary-hover: #c2410c;
+            --bg: #fff7ed;
+            --card-bg: #ffffff;
+            --text: #431407;
+            --muted: #9a3412;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #ffedd5;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hud {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .coin-badge {
+            background: #fef08a;
+            color: #854d0e;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-section h1 {
+            font-size: 4rem;
+            margin: 0 0 10px 0;
+            color: var(--text);
+            text-shadow: 3px 3px 0px #ffedd5;
+        }
+
+        .header-section p {
+            font-size: 1.5rem;
+            color: var(--muted);
+            margin: 0;
+            max-width: 800px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+            margin-top: 20px;
+            padding-bottom: 50px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 2px solid #fed7aa;
+            border-radius: 20px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(234, 88, 12, 0.2);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            background: #ffedd5;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .card:hover .card-icon {
+            background: var(--primary);
+            color: white;
+            transform: rotate(10deg);
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            color: var(--primary-hover);
+        }
+
+        .card-sub {
+            font-size: 1.2rem;
+            color: var(--muted);
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .btn-play {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        .btn-play:hover {
+            background: var(--primary-hover);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <div class="logo"> Indian Culture Game Zone</div>
+        <div class="hud">
+            <div class="coin-badge"><i class="fa-solid fa-coins"></i> <span id="coinDisplay">0</span></div>
+            <button onclick="window.close()"
+                style="background:var(--primary); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold; font-family:'Outfit'">Back
+                to Qrio</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="header-section">
+            <h1>Cultural Heritage Arts</h1>
+            <p>Explore the rich traditions, mythology, and arts of India through interactive gamified experiences.</p>
+        </div>
+
+        <div class="game-grid">
+
+            <a href="culture_dance.html" target="_blank" class="card">
+                <h2 class="card-title">Classical Dance</h2>
+                <p class="card-sub">Use your camera to match Mudras and movement steps for Bharatanatyam, Odissi, and
+                    more.</p>
+                <button class="btn-play">Enter Dance Studio</button>
+            </a>
+
+            <a href="culture_music.html" target="_blank" class="card">
+                <h2 class="card-title">Rhythm Game</h2>
+                <p class="card-sub">Tap to the rhythm of classical instruments like the Tabla, Sitar, and Flute.</p>
+                <button class="btn-play">Enter Music Room</button>
+            </a>
+
+            <a href="culture_story.html" target="_blank" class="card">
+                <h2 class="card-title">Mythological Theatre</h2>
+                <p class="card-sub">Select a character from Epics. Read the script aloud to practice pronunciation and
+                    storytelling!</p>
+                <button class="btn-play">Enter Theatre</button>
+            </a>
+
+        </div>
+
+    </div>
+
+    <script>
+        function refreshPoints() {
+            let activeId = localStorage.getItem('qrio_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points/' + activeId)
+                    .then(r => r.json())
+                    .then(data => {
+                        document.getElementById('coinDisplay').innerText = data.points || 0;
+                    }).catch(e => console.log(e));
+            }
+        }
+        setInterval(refreshPoints, 2000);
+        refreshPoints();
+    </script>
+</body>
+
+</html>

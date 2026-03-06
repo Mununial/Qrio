@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="or">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Light Puzzle - BSE Odisha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #1e1b4b;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Mukta Malar', sans-serif;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: #facc15;
+        }
+
+        p {
+            margin: 0 0 30px 0;
+            font-size: 1.2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .mirror {
+            width: 60px;
+            height: 60px;
+            background: #94a3b8;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        /* Line indicating reflective side */
+        .mirror::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 64px;
+            height: 5px;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+        }
+
+        .emitter {
+            font-size: 2rem;
+        }
+
+        .target {
+            font-size: 2rem;
+            filter: grayscale(1);
+            transition: 0.5s;
+        }
+
+        .target.lit {
+            filter: grayscale(0);
+            text-shadow: 0 0 20px #facc15;
+        }
+
+        .laser {
+            position: absolute;
+            background: #ef4444;
+            z-index: 10;
+            box-shadow: 0 0 10px #ef4444;
+            transform-origin: top left;
+            transition: width 0.3s;
+        }
+
+        .btn {
+            background: #eab308;
+            color: #422006;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            font-family: 'Mukta Malar';
+        }
+
+        .btn:hover {
+            background: #facc15;
+        }
+
+        .win-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 27, 75, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .win-overlay h2 {
+            font-size: 4rem;
+            color: #facc15;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button onclick="window.close()"
+        style="position:absolute; top:20px; right:20px; background:transparent; border:2px solid #facc15; color:#facc15; padding:5px 15px; border-radius:20px; font-family:'Mukta Malar'; cursor:pointer; font-weight:bold;">ବନ୍ଦ
+        କରନ୍ତୁ (Exit)</button>
+
+    <h1>ଆଲୋକର ପ୍ରତିଫଳନ (Reflection of Light)</h1>
+    <p>Click the mirrors to rotate them. Reflect the light to the target.</p>
+
+    <!-- Hardcoded grid for demo: 
+         [E][ ][M][ ]
+         [ ][ ][ ][ ]
+         [ ][T][M][ ]
+         [ ][ ][ ][ ]
+         E=Emitter, M=Mirror, T=Target
+    -->
+    <div class="grid" id="grid">
+        <div class="cell">
+            <div class="emitter">🔦</div>
+        </div>
+        <div class="cell"></div>
+        <div class="cell">
+            <div class="mirror" id="m1" data-rot="0" onclick="rotate(this)"></div>
+        </div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell">
+            <div class="target" id="target">🎯</div>
+        </div>
+        <div class="cell">
+            <div class="mirror" id="m2" data-rot="90" onclick="rotate(this)" style="transform: rotate(90deg)"></div>
+        </div>
+        <div class="cell"></div>
+
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div>
+
+    <!-- Laser paths drawn dynamically -->
+    <div id="lasers"></div>
+
+    <button class="btn" onclick="fireLaser()">କିରଣ ପ୍ରୟୋଗ (Fire Laser)</button>
+
+    <div class="win-overlay" id="winScreen">
+        <h2>ସଫଳତା! (Success!)</h2>
+        <p style="color:#fde047; font-size:1.5rem;">You correctly reflected the light!</p>
+        <p style="color: #4ade80; font-size: 2rem;">+50 Points Earned!</p>
+        <button class="btn" onclick="window.close()">ଫେରିଯାଆନ୍ତୁ (Return)</button>
+    </div>
+
+    <script>
+        function rotate(el) {
+            let current = parseInt(el.getAttribute('data-rot'));
+            current = (current + 90) % 360;
+            el.setAttribute('data-rot', current);
+            el.style.transform = `rotate(${current}deg)`;
+            clearLasers(); // clear laser on rotate
+        }
+
+        function clearLasers() {
+            document.getElementById('lasers').innerHTML = '';
+            document.getElementById('target').classList.remove('lit');
+        }
+
+        function fireLaser() {
+            clearLasers();
+
+            const gridRect = document.getElementById('grid').getBoundingClientRect();
+            // Start position (cell 0,0 center)
+            const sx = gridRect.left + 65; // Emitter offset
+            const sy = gridRect.top + 55;
+
+            // Hardcoded solution checking for demo simplicity
+            // M1 is at (class=cell index 2) x: 2, y: 0. M2 is at x: 2, y: 2. Target is at x: 1, y: 2.
+            // Beam goes Right to M1. 
+            // M1 needs to reflect Down. So M1 needs reflective side top-right (225deg) or top-left (135deg depending on face). 
+            // Actually, mirror CSS line is at TOP (0deg).
+            // To bounce light coming from LEFT to DOWN, mirror angle must be 135deg ( / shape)
+            // Down to Target (Left). So M2 needs to bounce DOWN to LEFT. Mirror angle = 45deg ( \ shape)
+
+            const m1Rot = parseInt(document.getElementById('m1').getAttribute('data-rot'));
+            const m2Rot = parseInt(document.getElementById('m2').getAttribute('data-rot'));
+
+            drawLaser(sx, sy, 200, 0); // Emitter to M1
+
+            if (m1Rot === 135 || m1Rot === 315) {
+                // Correctly bounced down
+                drawLaser(sx + 210, sy, 210, 90); // M1 to M2
+
+                if (m2Rot === 45 || m2Rot === 225) {
+                    // Correctly bounced left
+                    drawLaser(sx + 210, sy + 210, 105, 180); // M2 to Target
+
+                    document.getElementById('target').classList.add('lit');
+                    setTimeout(() => {
+                        document.getElementById('winScreen').style.display = 'flex';
+                        awardPoints();
+                    }, 1000);
+                }
+            } else {
+                // Wrong angle logic (absorb or reflect wrong way)
+                // Just stop for demo visual
+            }
+        }
+
+        function drawLaser(x, y, length, angle) {
+            const el = document.createElement('div');
+            el.className = 'laser';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.width = '0px';
+            el.style.height = '4px';
+            el.style.transform = `rotate(${angle}deg)`;
+            document.getElementById('lasers').appendChild(el);
+
+            // Animate
+            setTimeout(() => { el.style.width = length + 'px'; }, 50);
+        }
+
+        function awardPoints() {
+            let activeId = localStorage.getItem('QRIO_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: 50 })
+                }).catch(console.error);
+            }
+        }
+    </script>
+</body>
+
+</html>

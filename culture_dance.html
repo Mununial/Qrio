@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classical Dance - Indian Culture</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            color: #7c2d12;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .hud {
+            position: absolute;
+            top: 100px;
+            right: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .hud h2 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #ea580c;
+        }
+
+        .video-container {
+            position: relative;
+            width: 640px;
+            height: 480px;
+            margin: 30px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(124, 45, 18, 0.2);
+            border: 4px solid white;
+        }
+
+        video {
+            transform: scaleX(-1);
+            display: none;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: scaleX(-1);
+        }
+
+        .instructions {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            color: #9a3412;
+        }
+
+        .btn-back {
+            background: #ea580c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Outfit';
+        }
+
+        .btn-back:hover {
+            background: #c2410c;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 247, 237, 0.95);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            display: none;
+        }
+
+        .overlay h1 {
+            font-size: 4rem;
+            color: #ea580c;
+            margin-bottom: 0;
+        }
+
+        .pose-card {
+            position: absolute;
+            top: 100px;
+            left: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            font-size: 1.5rem;
+            color: #ea580c;
+            font-weight: bold;
+            text-align: center;
+            width: 200px;
+        }
+
+        .pose-img {
+            width: 100%;
+            height: 150px;
+            background: #ffedd5;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div style="font-weight: 900; font-size: 1.5rem;"> Classical Dance
+            Studio</div>
+        <button class="btn-back" onclick="window.close()">Exit Studio</button>
+    </nav>
+
+    <div class="hud">
+        <p style="margin:0; font-weight: bold; color: #f97316;">Dance Score</p>
+        <h2 id="scoreDisplay">0 px</h2>
+    </div>
+
+    <div class="pose-card">
+        Current Target:
+        <div id="targetName" style="color: #9a3412; font-size:2rem; margin-top:10px;">Anjali Mudra</div>
+        <div class="pose-img" id="targetImg">Pose</div>
+    </div>
+
+    <div class="overlay" id="gameOverOverlay">
+        <h1>Performance Complete</h1>
+        <p style="font-size: 1.5rem; color: #c2410c" id="finalScore">You earned 0 px</p>
+        <button class="btn-back" onclick="location.reload()"
+            style="font-size:1.5rem; padding: 15px 30px; margin-top: 20px;">Restart Session</button>
+    </div>
+
+    <div class="video-container">
+        <video id="video" width="640" height="480" autoplay playsinline></video>
+        <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+
+    <div class="instructions" id="instructionText">
+        Allow Camera Access & perform the target pose!
+    </div>
+
+    <!-- MediaPipe scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+
+    <script>
+        const videoElement = document.getElementById('video');
+        const canvasElement = document.getElementById('canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        let score = 0;
+        let poseCooldown = 0;
+        let gameActive = true;
+
+        let poses = [
+            { name: "Anjali Mudra", icon: "🙏", instruction: "Bring both hands directly together in front of your chest." },
+            { name: "Aramandi", icon: "🩰", instruction: "Half-sit: Keep hands wide out to the sides horizontally!" }
+        ];
+        let currentPoseIdx = 0;
+        let completedPoses = 0;
+
+        function updateTarget() {
+            if (completedPoses >= 6) {
+                gameActive = false;
+                document.getElementById('finalScore').innerText = `You earned ${score} px`;
+                document.getElementById('gameOverOverlay').style.display = 'flex';
+                return;
+            }
+            currentPoseIdx = Math.floor(Math.random() * poses.length);
+            document.getElementById('targetName').innerText = poses[currentPoseIdx].name;
+            document.getElementById('targetImg').innerText = poses[currentPoseIdx].icon;
+            document.getElementById('instructionText').innerText = poses[currentPoseIdx].instruction;
+        }
+
+        function updatePoints() {
+            score += 20;
+            document.getElementById('scoreDisplay').innerText = score + " px";
+            document.getElementById('instructionText').innerHTML = "<span style='color: #16a34a'>Perfect Form! +20 Points</span>";
+            completedPoses++;
+
+            let activeId = localStorage.getItem('QRIO_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: 20 })
+                }).catch(console.error);
+            }
+
+            poseCooldown = 150; // pause before next
+            setTimeout(updateTarget, 2000);
+        }
+
+        function onResults(results) {
+            if (!gameActive) return;
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            if (results.poseLandmarks) {
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#ea580c', lineWidth: 4 });
+                drawLandmarks(canvasCtx, results.poseLandmarks, { color: '#ffffff', lineWidth: 2 });
+
+                if (poseCooldown > 0) {
+                    poseCooldown--;
+                    canvasCtx.restore();
+                    return;
+                }
+
+                const lm = results.poseLandmarks;
+                let poseMatched = false;
+
+                // Anjali Mudra: Hands close together at chest level
+                if (poses[currentPoseIdx].name === "Anjali Mudra") {
+                    const leftWrist = lm[15];
+                    const rightWrist = lm[16];
+                    if (leftWrist && rightWrist && leftWrist.visibility > 0.6 && rightWrist.visibility > 0.6) {
+                        const dist = Math.sqrt(Math.pow(leftWrist.x - rightWrist.x, 2) + Math.pow(leftWrist.y - rightWrist.y, 2));
+                        // Hands close
+                        if (dist < 0.1) poseMatched = true;
+                    }
+                }
+
+                // Aramandi (approximate arms out wide)
+                if (poses[currentPoseIdx].name === "Aramandi") {
+                    const lShoulder = lm[11], rShoulder = lm[12];
+                    const lWrist = lm[15], rWrist = lm[16];
+                    if (lShoulder && rShoulder && lWrist && rWrist) {
+                        // hands far apart horizontally, Y similar to shoulder
+                        const xDist = Math.abs(lWrist.x - rWrist.x);
+                        if (xDist > 0.6) poseMatched = true; // basic approximation
+                    }
+                }
+
+                if (poseMatched) updatePoints();
+            }
+            canvasCtx.restore();
+        }
+
+        const pose = new Pose({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+        });
+        pose.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        pose.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => { await pose.send({ image: videoElement }); },
+            width: 640, height: 480
+        });
+        camera.start();
+        updateTarget();
+    </script>
+</body>
+
+</html>

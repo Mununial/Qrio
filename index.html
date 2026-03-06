@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qrio - Unlock the wonders</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <style>
+        :root {
+            /* Light Theme (Default Premium) */
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-dark: #3730a3;
+            --secondary: #ec4899;
+            --accent: #10b981;
+            --bg-color: #f8fafc;
+            --section-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --card-border: rgba(0, 0, 0, 0.05);
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            --nav-text: #1e293b;
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.05);
+            --hero-text: #1e293b;
+            /* Dashboard Mission Control (Light) - High Contrast Swag */
+            --dash-bg: #f1f5f9;
+            --dash-sidebar: #ffffff;
+            --dash-card: #ffffff;
+            --dash-border: rgba(0, 0, 0, 0.06);
+            --dash-text: #0f172a;
+            --dash-muted: #475569;
+            --hud-grad: linear-gradient(135deg, #ffffff, #e2e8f0);
+            --glass-shine: rgba(0, 0, 0, 0.03);
+            --neon-glow: 0 0 15px rgba(99, 102, 241, 0.1);
+
+            /* Status Tokens - Light Mode */
+            --primary-light-alpha: rgba(79, 70, 229, 0.1);
+            --primary-border: rgba(79, 70, 229, 0.2);
+            --primary-dark: #3730a3;
+
+            --success-light-alpha: rgba(16, 185, 129, 0.1);
+            --success-border: rgba(16, 185, 129, 0.2);
+            --success-dark: #065f46;
+
+            --warning-light-alpha: rgba(245, 158, 11, 0.1);
+            --warning-border: rgba(245, 158, 11, 0.2);
+            --warning-dark: #92400e;
+
+            --danger-light-alpha: rgba(239, 68, 68, 0.1);
+            --danger-border: rgba(239, 68, 68, 0.2);
+            --danger-dark: #991b1b;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme (Vision Mode) */
+            --bg-color: #020617;
+            --section-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --nav-bg: rgba(2, 6, 23, 0.8);
+            --nav-text: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --hero-text: #ffffff;
+            /* Dashboard Mission Control (Dark) */
+            --dash-bg: #020617;
+            --dash-sidebar: rgba(15, 23, 42, 0.85);
+            --dash-card: rgba(30, 41, 59, 0.5);
+            --dash-border: rgba(255, 255, 255, 0.08);
+            --dash-text: #f8fafc;
+            --dash-muted: #94a3b8;
+            --hud-grad: linear-gradient(135deg, #1e293b, #0f172a);
+            --glass-shine: rgba(255, 255, 255, 0.05);
+
+            /* Status Tokens - Dark Mode */
+            --primary-light-alpha: rgba(129, 140, 248, 0.15);
+            --primary-border: rgba(129, 140, 248, 0.3);
+            --primary-dark: #818cf8;
+
+            --success-light-alpha: rgba(52, 211, 153, 0.15);
+            --success-border: rgba(52, 211, 153, 0.3);
+            --success-dark: #34d399;
+
+            --warning-light-alpha: rgba(251, 191, 36, 0.15);
+            --warning-border: rgba(251, 191, 36, 0.3);
+            --warning-dark: #fbbf24;
+
+            --danger-light-alpha: rgba(248, 113, 113, 0.15);
+            --danger-border: rgba(248, 113, 113, 0.3);
+            --danger-dark: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .main-gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: var(--bg-color);
+        }
+
+        @keyframes bgShift {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .blob {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(236, 72, 153, 0.3));
+            filter: blur(100px);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+            animation: floatBlob 20s infinite alternate;
+        }
+
+        @keyframes floatBlob {
+            0% { transform: translate(-10%, -10%) rotate(0deg); }
+            100% { transform: translate(10%, 10%) rotate(360deg); }
+        }
+
+        #blob1 { top: -100px; left: -100px; }
+        #blob2 { bottom: -100px; right: -100px; background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(16, 185, 129, 0.2)); }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 5px;
+            border: 2px solid #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+
+        /* App Containers */
+        .view {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .view.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000; /* Increased z-index */
+            background: var(--nav-bg);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0.8rem 1rem;
+            }
+            .nav-links {
+                gap: 1rem;
+            }
+            .nav-links a {
+                display: none; /* Hide links on mobile for cleaner look */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dash-nav {
+                flex-direction: column;
+                gap: 10px;
+                padding: 15px;
+            }
+            .tabs {
+                overflow-x: auto;
+                justify-content: flex-start !important;
+                padding: 10px 5px;
+                -webkit-overflow-scrolling: touch;
+                gap: 10px;
+            }
+            .tab-btn {
+                white-space: nowrap;
+                padding: 10px 20px !important;
+            }
+            .welcome-hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 30px 20px !important;
+            }
+            .welcome-hero h1 {
+                font-size: 2rem !important;
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--nav-text);
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* General Button */
+        button {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Landing Page Sections */
+        .hero {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            align-items: center;
+            min-height: 90vh;
+            padding: 5rem 5% 4rem; /* Adjusted top padding */
+            gap: 4rem;
+            text-align: left;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+                padding-top: 8rem;
+            }
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            .hero p {
+                margin: 0 auto 2.5rem;
+            }
+            .hero-btns {
+                justify-content: center;
+            }
+        }
+
+        .hero-image-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: floatHero 6s ease-in-out infinite;
+        }
+
+        @keyframes floatHero {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            max-width: 400px; /* Slightly smaller */
+            aspect-ratio: 1 / 1; /* Square for circle */
+            object-fit: cover;
+            border-radius: 50%; /* Pure circle */
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.3);
+            border: 4px solid white; /* Thick premium border */
+        }
+
+        [data-theme="dark"] .hero-image-container img {
+            border-color: var(--primary);
+        }
+
+        .hero-image-container::before {
+            content: '';
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 2rem;
+            color: var(--text-main);
+            letter-spacing: -3px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 3.5rem;
+            line-height: 1.6;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 1rem 2.2rem;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(99, 102, 241, 0.05);
+            transform: translateY(-2px);
+        }
+        /* --- MISSION CONTROL UI (DASHBOARD 3.0) --- */
+        .dash-layout {
+            display: flex;
+            min-height: 100vh;
+            background: var(--dash-bg);
+            color: var(--dash-text);
+            transition: background-color 0.5s ease;
+        }
+
+        .dash-sidebar {
+            width: 280px;
+            background: var(--dash-sidebar);
+            border-right: 1px solid var(--dash-border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 15px;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .side-tab-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            color: var(--dash-muted);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .side-tab-btn:hover {
+            background: var(--primary-light-alpha);
+            color: var(--primary);
+        }
+
+        .side-tab-btn.active {
+            background: var(--primary-light-alpha);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            padding-left: 18px;
+        }
+
+        .side-tab-btn i {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .dash-main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* Swag Animations */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(99, 102, 241, 0.6); }
+            100% { box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+        }
+
+        .ai-action-btn {
+            animation: pulse-glow 3s infinite;
+        }
+
+        .side-tab-btn:hover i {
+            transform: scale(1.2) rotate(-10deg);
+            color: var(--primary);
+        }
+
+        .side-tab-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        /* Mission Cards */
+        .mission-card {
+            background: var(--dash-card);
+            border-radius: 24px;
+            padding: 25px;
+            border: 1px solid var(--dash-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .mission-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.12);
+            background: var(--dash-card);
+            opacity: 0.95;
+        }
+
+        .mission-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .mission-card:hover::after {
+            transform: translateX(100%);
+        }
+
+        .mission-icon-container {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .mission-card:hover .mission-icon-container {
+            transform: scale(1.2) rotate(10deg);
+            filter: brightness(1.2);
+        }
+
+        .difficulty-tag {
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Mobile Adjustments 4.0 */
+        @media (max-width: 1024px) {
+            .dash-sidebar { 
+                position: fixed;
+                left: -320px;
+                top: 0;
+                height: 100vh;
+                width: 280px;
+                z-index: 5000;
+                display: flex !important;
+                visibility: visible;
+                background: var(--dash-sidebar);
+                box-shadow: 20px 0 60px rgba(0,0,0,0.4);
+            }
+            .dash-sidebar.drawer-open {
+                left: 0;
+            }
+            .dash-main { padding: 15px; padding-bottom: 110px; }
+            .mobile-bottom-nav { display: flex !important; }
+            .mission-card { padding: 15px; }
+            .ai-action-btn { width: 55px; height: 55px; margin-top: -25px; font-size: 1.5rem; }
+            .dash-content-grid { grid-template-columns: 1fr !important; }
+            .welcome-section { padding: 25px !important; flex-direction: column; text-align: center; }
+            .welcome-section h1 { font-size: 2rem !important; }
+            .side-hud { order: -1; } 
+        }
+
+        .mobile-top-bar {
+            display: none;
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: var(--dash-sidebar);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--dash-border);
+            z-index: 4000;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-top-bar { display: flex; }
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 4500;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 1024px) {
+            #gameNotify { display: none !important; }
+        }
+
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--dash-sidebar);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--dash-border);
+            padding: 10px 0;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .mobile-nav-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 1.4rem;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mobile-nav-btn.active { color: #818cf8; }
+        .mobile-nav-label { font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+        .ai-action-btn {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.5);
+            margin-top: -35px;
+            border: 5px solid var(--dash-bg);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ai-action-btn:hover {
+            transform: scale(1.15) rotate(15deg);
+            box-shadow: 0 0 40px rgba(168, 85, 247, 0.7);
+        }
+
+        .section {
+            padding: 6rem 10%;
+            text-align: center;
+            background: var(--section-bg);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            border-radius: 28px;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-light);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            background: #0f172a;
+            padding: 5rem 10% 2.5rem;
+            color: white;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: auto;
+        }
+
+        [data-theme="dark"] footer {
+            background: #020617;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .footer-brand p {
+                margin: 0 auto 1.5rem;
+            }
+            .socials {
+                justify-content: center;
+            }
+            .footer-links h3 {
+                border-left: none;
+                border-bottom: 3px solid var(--primary);
+                display: inline-block;
+                padding: 0 0 5px 0;
+            }
+        }
+
+        .footer-brand h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--primary-light);
+        }
+
+        .footer-brand p {
+            color: #94a3b8;
+            max-width: 320px;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .footer-links h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            border-left: 3px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .socials {
+            display: flex;
+            gap: 1.2rem;
+        }
+
+        .socials a {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .socials a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            color: white;
+        }
+
+        /* Auth Screen Redesign */
+        .auth-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            perspective: 1200px;
+            padding: 80px 20px 20px 20px; /* Top padding to avoid nav overlap */
+        }
+
+        .flip-card {
+            width: 100%;
+            max-width: 420px;
+            height: 600px; /* Increased height for breathing room */
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            background: var(--card-bg);
+            padding: 2.5rem; /* Standardized padding */
+            border-radius: 24px;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            width: 100%;
+        }
+
+        .auth-form h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            text-align: center;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        /* Form Inputs */
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text-main);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .auth-form input.error-border {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.3s;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+        }
+
+        .forgot-link {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: -0.75rem;
+            font-weight: 600;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-google {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-google:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+        }
+
+        .spinner {
+            display: none;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 1s linear infinite;
+            /* Safari */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .auth-toggle span {
+            color: var(--primary);
+            font-weight: 800;
+            position: relative;
+        }
+
+        .auth-toggle span::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.25s ease-out;
+        }
+
+        .auth-toggle span:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Dashboard Screen */
+        .dash-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .user-id-badge {
+            background: #f1f5f9;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .dash-container {
+            padding: 3rem 5%;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 1rem 2.2rem;
+            border: none;
+            background: var(--card-bg);
+            color: var(--text-muted);
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--card-border);
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            transform: translateY(-2px);
+            border-color: var(--primary-light);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white !important;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            border-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(79, 70, 229, 0.2);
+            border-color: var(--primary);
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+
+        .game-card:hover::after {
+            transform: translateX(100%);
+        }
+
+        .game-thumb {
+            height: 220px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-light);
+            font-size: 5rem;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-shadow: 0 0 20px var(--primary);
+        }
+
+        .game-card:hover .game-thumb {
+            transform: scale(1.1) rotate(2deg);
+        }
+
+        .game-info {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .game-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-info p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .btn-play {
+            background: #10b981;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-weight: bold;
+            display: block;
+            transition: background 0.3s;
+        }
+
+        .btn-play:hover {
+            background: #059669;
+        }
+
+        /* Custom Gaming Notification */
+        #gameNotify {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--primary);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 800;
+            box-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+        }
+
+        #gameNotify.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #gameNotify i {
+            font-size: 1.5rem;
+            color: var(--primary-light);
+        }
+
+        .btn-play-gaming {
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            padding: 1.2rem 3rem;
+            font-size: 1.2rem;
+            border-radius: 100px;
+            border: none;
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-play-gaming:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(236, 72, 153, 0.6);
+        }
+
+        .btn-play-gaming::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-play-gaming:hover::before {
+            left: 100%;
+        }
+
+        /* Mission Card Swag Animations */
+        @keyframes shine {
+            0% { left: -100%; top: -100%; }
+            100% { left: 100%; top: 100%; }
+        }
+
+        .mission-card:hover::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes float-swag {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .qrio-card-premium {
+            animation: float-swag 6s infinite ease-in-out;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+        }
+
+        .side-tab-btn.active {
+            border-left: 4px solid var(--primary) !important;
+            padding-left: 22px !important;
+        }
+
+        #sideWalletPoints {
+            letter-spacing: -2px;
+            text-shadow: var(--neon-glow);
+        }
+        /* Masty Bot Styles */
+        #mastyBot {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 50% 50% 10% 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            cursor: move;
+            z-index: 10000;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: robot-hover 3s infinite ease-in-out;
+            touch-action: none;
+        }
+
+        #mastyBot:hover { transform: scale(1.1); }
+        #mastyBot:active { transform: scale(0.9); }
+
+        @keyframes robot-hover {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        #chatWindow {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: 350px;
+            height: 480px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            animation: chat-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes chat-pop { from { transform: scale(0.5) translateY(100px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .chat-header {
+            padding: 20px;
+            background: linear-gradient(90deg, #6366f1, #a855f7);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(0,0,0,0.05);
+        }
+
+        .msg {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            animation: msg-in 0.3s ease;
+        }
+
+        @keyframes msg-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg.bot { background: white; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        .chat-input-area {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .chat-input-area button {
+            background: var(--primary);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            #chatWindow { width: calc(100vw - 40px); right: 20px; bottom: 100px; height: 400px; }
+            #mastyBot { width: 60px; height: 60px; bottom: 20px; right: 20px; font-size: 1.8rem; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Gaming Notification System -->
+    <div id="gameNotify">
+        <i class="fa-solid fa-gamepad"></i>
+        <span id="notifyText">Mission Updated!</span>
+    </div>
+
+    <!-- Masty Chatbot Robot -->
+    <div id="mastyBot" onmousedown="startDrag(event)" ontouchstart="startDrag(event)" onclick="toggleChat()">
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <!-- Chat Window -->
+    <div id="chatWindow">
+        <div class="chat-header">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <i class="fa-solid fa-robot"></i>
+                <div>
+                    <div style="font-weight:900; font-size:0.9rem;">Qrio Masty Bot</div>
+                    <div style="font-size:0.6rem; opacity:0.8;">Online & Naughty 😉</div>
+                </div>
+            </div>
+            <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="toggleChat()"></i>
+        </div>
+        <div class="chat-messages" id="chatMsgs">
+            <div class="msg bot">Yo, Agent! I'm Qrio. Study karoge ya masty? 😜</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <button onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- AOS Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <div class="main-gradient-bg"></div>
+    <div class="blob" id="blob1"></div>
+    <div class="blob" id="blob2"></div>
+
+    <!-- Three.js Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <nav id="mainNav">
+        <div class="logo" onclick="navigateTo('landingView')">Qrio</div>
+        <div class="nav-links">
+            <a href="javascript:void(0)" onclick="goToSection('about')">About</a>
+            <a href="javascript:void(0)" onclick="goToSection('features')">Features</a>
+            <a href="javascript:void(0)" onclick="goToSection('contact')">Contact</a>
+            <div id="themeToggle" onclick="toggleTheme()" style="cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg-color); color: var(--text-main); border: 1px solid var(--glass-border); font-size: 1.2rem;">
+                <i class="fa-solid fa-moon"></i>
+            </div>
+            <button class="btn-primary" onclick="navigateTo('authView')">Get Started</button>
+        </div>
+    </nav>
+
+    <!-- 1. Landing View -->
+    <div id="landingView" class="view active">
+        <section class="hero">
+            <div class="hero-content" data-aos="fade-right">
+                <h1 id="hero-title">Unlock the <br><span>Imagineering</span> <br>Wonders</h1>
+                <p id="hero-subtitle">Experience a new dimension of learning where AI meets interaction. From voice-activated chemistry labs to gesture-controlled math adventures. Step into the future of education today.</p>
+                <div class="hero-btns">
+                    <button class="btn-primary" style="padding: 1.2rem 2.5rem; font-size: 1.1rem;" onclick="navigateTo('authView')">Start Your Mission</button>
+                    <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">Explore Games</button>
+                </div>
+            </div>
+            <div class="hero-image-container" data-aos="fade-left" data-aos-delay="300">
+                <img src="hero.png" alt="Qrio AI Visual">
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <h2>About Qrio</h2>
+            <p style="max-width: 800px; margin: 0 auto; line-height: 1.8; color: var(--text-muted); font-size: 1.1rem;">
+                Qrio is dedicated to making education universally accessible. Whether you are seeking standard
+                curriculum games or highly specialized accessible learning environments for users with disabilities,
+                Qrio provides state-of-the-art interactive modules. Our engine utilizes Audio tracking and Computer
+                Vision to ensure everyone can play and learn.
+            </p>
+        </section>
+
+        <section id="features" class="section">
+            <h2>The Qrio Ecosystem</h2>
+            <p style="max-width: 700px; margin: -2rem auto 3rem; color: var(--text-muted); font-size: 1.1rem;">Explore
+                our comprehensive suite of educational modules designed for total engagement, accessibility, and fun.
+            </p>
+            <div class="grid-3">
+                <div class="feature-card">
+                    <i class="fa-solid fa-book-open"></i>
+                    <h3>Standard & Regional</h3>
+                    <p>Interactive syllabi covering global SST/Science and specialized BSE Odisha regional content in
+                        native Odia.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>SkillVerse Life Skills</h3>
+                    <p>Master real-world skills like Cyber Security, Yoga, Business Management, and Mental Wellness
+                        through 3D gameplay.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-palette"></i>
+                    <h3>Indian Culture Zone</h3>
+                    <p>Celebrate heritage with classical dance pose-matching, rhythm-based music, and mythological voice
+                        storytelling.</p>
+                </div>
+                <div class="feature-card" style="border-top: 4px solid #c026d3;">
+                    <i class="fa-solid fa-bolt" style="color: #c026d3;"></i>
+                    <h3>AI Game Generator</h3>
+                    <p>Instantly convert PDFs, Videos, or YouTube links into interactive playable quiz worlds using
+                        semantic AI extraction.</p>
+                </div>
+                <div class="feature-card" style="border-top: 4px solid #10b981;">
+                    <i class="fa-solid fa-hand-holding-hand" style="color: #10b981;"></i>
+                    <h3>Inclusive Accessibility</h3>
+                    <p>Native support for voice-activated chemistry labs and gesture-controlled spatial math for
+                        learners of all abilities.</p>
+                </div>
+
+                <div class="feature-card" style="border-top: 4px solid #facc15;">
+                    <i class="fa-solid fa-credit-card" style="color: #ea580c;"></i>
+                    <h3 style="color:var(--text-main);">Reward Economy</h3>
+                    <p style="color:var(--text-muted); font-weight:500;">Earn points, complete daily tasks, and redeem rewards like Store Discounts and Swag via your personalized Qrio Pass.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="section">
+            <h2>Get In Touch</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Have questions or want to collaborate? We'd love to hear from you.</p>
+            <div class="feature-card" style="max-width: 600px; margin: 0 auto; padding: 2.5rem;">
+                <form onsubmit="event.preventDefault(); showGameNotify('Message Sent Sucessfully!'); this.reset();">
+                    <div id="contactGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="input-group">
+                            <input type="text" placeholder="Your Name" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main); outline: none;">
+                        </div>
+                        <div class="input-group">
+                            <input type="email" placeholder="Your Email" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main); outline: none;">
+                        </div>
+                    </div>
+                    <textarea placeholder="Your Message" required style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid var(--card-border); background: var(--bg-color); color: var(--text-main); outline: none; height: 150px; margin-bottom: 2rem;"></textarea>
+                    <button class="btn-primary" style="width: 100%; padding: 1.2rem;">Send Mission Request</button>
+                </form>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo" style="margin-bottom: 1rem; color: var(--primary-light);">Qrio</div>
+                    <p>Experience a new dimension of learning where AI meets interaction. Empowering every mind, everyday.</p>
+                    <div class="socials">
+                        <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-github"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Explore</h3>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#" onclick="navigateTo('authView')">Get Started</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Modules</h3>
+                    <ul>
+                        <li><a href="#">AI Generator</a></li>
+                        <li><a href="#">SkillVerse</a></li>
+                        <li><a href="#">Odia Learning</a></li>
+                        <li><a href="#">Reward Hub</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Use</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Safety Center</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Qrio Wonder. All rights reserved.</p>
+                <p>Made with ❤️ for Learners</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 2. Auth View (Flip Card) -->
+    <div id="authView" class="view" style="background: var(--bg-color); position: relative;">
+        <nav id="authNav" style="z-index: 10001; background: var(--nav-bg); border-bottom: 1px solid var(--glass-border); padding: 1rem 5%; backdrop-filter: blur(10px);">
+            <div class="logo" onclick="navigateTo('landingView')">Qrio</div>
+            <button class="btn-secondary" style="background: var(--card-bg); color: var(--text-main); border: 1px solid var(--glass-border);"
+                onclick="navigateTo('landingView')"><i class="fa-solid fa-arrow-left"></i> Back to Home</button>
+        </nav>
+
+
+        <div class="auth-container">
+            <div class="flip-card" id="authCard">
+                <!-- Sign In -->
+                <div class="flip-card-front">
+                    <form class="auth-form" id="signInForm" onsubmit="handleAuth(event, 'signin')">
+                        <h2>Welcome Back</h2>
+                        <div class="input-group">
+                            <input type="text" id="signin-id" placeholder="User ID">
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="signin-pwd" placeholder="Password">
+                            <i class="fa-solid fa-eye toggle-password"
+                                onclick="togglePasswordVis('signin-pwd', this)"></i>
+                        </div>
+                        <div style="display:flex; justify-content: space-between; align-items:center; margin: 5px 0 15px 0;">
+                            <label style="font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                                <input type="checkbox" style="width: 18px; height: 18px; cursor: pointer;"> 
+                                <span style="margin-top: 2px;">Remember me</span>
+                            </label>
+                            <a href="#" class="forgot-link" style="margin:0; font-size:0.9rem;">Forgot Password?</a>
+                        </div>
+                        <p id="signin-err" style="color:#ef4444; font-size:0.9rem; margin:0 0 10px 0; display:none;">
+                        </p>
+
+                        <button type="submit" class="btn-submit" id="btn-signin">
+                            <span class="spinner" id="spin-signin"></span>
+                            <span class="btn-text">Log In</span>
+                        </button>
+
+                        <div style="margin: 20px 0; display:flex; align-items:center; color:#94a3b8; font-size:0.9rem;">
+                            <hr style="flex:1; border:none; border-top:1px solid #cbd5e1; margin-right:10px;"> OR
+                            <hr style="flex:1; border:none; border-top:1px solid #cbd5e1; margin-left:10px;">
+                        </div>
+                        <button type="button" class="btn-google" onclick="handleGoogleAuth()">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                            Continue with Google
+                        </button>
+
+                        <p class="auth-toggle" style="margin-top:20px;" onclick="toggleAuth()">New to Qrio? <span>Sign
+                                Up</span></p>
+                    </form>
+                </div>
+                <!-- Sign Up -->
+                <div class="flip-card-back">
+                    <form class="auth-form" id="signUpForm" onsubmit="handleAuth(event, 'signup')">
+                        <h2>Create Account</h2>
+                        <div class="input-group">
+                            <input type="text" id="signup-name" placeholder="Full Name">
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="signup-id" placeholder="Create User ID">
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="signup-pwd" placeholder="Create Password">
+                            <i class="fa-solid fa-eye toggle-password"
+                                onclick="togglePasswordVis('signup-pwd', this)"></i>
+                        </div>
+                        <p id="signup-err" style="color:#ef4444; font-size:0.9rem; margin:0 0 10px 0; display:none;">
+                        </p>
+
+                        <button type="submit" class="btn-submit" id="btn-signup">
+                            <span class="spinner" id="spin-signup"></span>
+                            <span class="btn-text">Join Qrio</span>
+                        </button>
+                        <p class="auth-toggle" onclick="toggleAuth()">Already have an account? <span>Sign In</span></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboardView" class="view" style="display:none; background: #0f172a;">
+        <div class="sidebar-overlay" id="sideOverlay" onclick="toggleMobileMenu()"></div>
+        
+        <div class="mobile-top-bar">
+            <button onclick="toggleMobileMenu()" style="background:none; border:none; color:var(--dash-text); font-size:1.5rem;"><i class="fa-solid fa-bars"></i></button>
+            <h2 style="font-size: 1.2rem; margin:0; font-weight:900; color:var(--dash-text);">QRIO<span style="color:var(--primary);">HUD</span></h2>
+            <div style="width:30px;"></div> <!-- Spacer -->
+        </div>
+
+        <div class="dash-layout">
+            <!-- Neon Floating Sidebar -->
+            <aside class="dash-sidebar" id="mainSidebar">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+                            <i class="fa-solid fa-rocket"></i>
+                        </div>
+                        <div>
+                            <h2 style="font-size: 1.2rem; margin:0; font-weight:900; color:var(--dash-text);">QRIO<span style="color:var(--primary);">HUD</span></h2>
+                            <div style="font-size: 0.55rem; color: var(--accent); font-weight:900; letter-spacing:1px;">MISSION_CONTROL</div>
+                        </div>
+                    </div>
+                    <button class="mobile-only" onclick="toggleMobileMenu()" style="background:none; border:none; color:var(--dash-muted); font-size:1.2rem; display:none;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <button class="side-tab-btn active" onclick="switchTab('tab-overview', this)"><i class="fa-solid fa-house"></i> Overview</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-standard', this)"><i class="fa-solid fa-gamepad"></i> Play 3D Learning Game</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-skillverse', this)"><i class="fa-solid fa-brain"></i> Learn From Content</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-generator', this)"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Game Generator</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-culture', this)"><i class="fa-solid fa-palette"></i> Indian Culture Zone</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-bse', this)"><i class="fa-solid fa-map"></i> Board Wise Learning</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-accessible', this)"><i class="fa-solid fa-universal-access"></i> Accessibility Hub</button>
+                <button class="side-tab-btn" onclick="switchTab('tab-shop', this)" style="color:var(--secondary);"><i class="fa-solid fa-cart-shopping"></i> Qrio Swag Hub</button>
+                <button class="side-tab-btn" onclick="toggleTheme()" id="dashThemeToggle"><i class="fa-solid fa-moon"></i> Switch Interface</button>
+                <button class="side-tab-btn" onclick="navigateTo('landingView')"><i class="fa-solid fa-arrow-left"></i> Return to Surface</button>
+                
+                <div style="margin-top: auto; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                        <img id="sideNavAvatar" src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Nial" style="width:40px; border-radius:10px; border:2px solid #818cf8;">
+                        <div>
+                            <div id="sideNavName" style="font-weight: 900; font-size: 0.9rem; color:var(--dash-text);">Agent Nial</div>
+                            <div style="font-size: 0.65rem; color: var(--primary); font-weight:900;">ALPHA UNIT</div>
+                        </div>
+                    </div>
+                    <button onclick="logout()" style="width: 100%; border: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 10px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size:0.75rem;">
+                        TERMINATE SESSION
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Mobile Action Bar -->
+            <div class="mobile-bottom-nav">
+                <button class="mobile-nav-btn active" onclick="switchTab('tab-overview', this)">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="mobile-nav-label">Overview</span>
+                </button>
+                <button class="mobile-nav-btn" onclick="switchTab('tab-standard', this)">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <span class="mobile-nav-label">Game</span>
+                </button>
+                <div class="ai-action-btn" onclick="switchTab('tab-generator', this)">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <button class="mobile-nav-btn" onclick="switchTab('tab-shop', this)">
+                    <i class="fa-solid fa-cart-shopping" style="color:var(--secondary);"></i>
+                    <span class="mobile-nav-label">Store</span>
+                </button>
+                <button class="mobile-nav-btn" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars"></i>
+                    <span class="mobile-nav-label">More</span>
+                </button>
+            </div>
+
+            <main class="dash-main">
+                <!-- MISSION HUB TAB -->
+                <div id="tab-overview" class="tab-content active">
+                    <div class="dash-content-grid" style="display: grid; grid-template-columns: 1fr 320px; gap: 30px;">
+                        
+                        <!-- Main Content -->
+                        <div>
+                            <!-- Agent Header -->
+                            <div class="welcome-section" style="background: var(--hud-grad); border-radius: 30px; padding: 40px; border: 1px solid var(--dash-border); position: relative; overflow: hidden; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
+                                <div style="position: absolute; top:-20px; right:-20px; font-size:12rem; color:var(--primary); opacity:0.05;"><i class="fa-solid fa-shield-cat"></i></div>
+                                <div style="position:relative; z-index:2;">
+                                    <h1 style="font-size: 2.8rem; font-weight: 900; color:var(--dash-text); margin:0; letter-spacing:-1px;">Welcome, <span id="welcomeNameDisplay" style="color:var(--primary);">Explorer</span></h1>
+                                    <p style="color: var(--dash-muted); font-size:1.1rem; margin:10px 0 30px 0;">All systems operational. Your daily missions are ready for execution.</p>
+                                    
+                                    <div style="display:flex; align-items:center; gap:25px;">
+                                        <div style="flex:1;">
+                                            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:900; color:var(--primary); margin-bottom:10px; letter-spacing:1px;">
+                                                <span>MISSION PROGRESS (LVL 14)</span>
+                                                <span>8,400 / 10,000 XP</span>
+                                            </div>
+                                            <div style="height:12px; background:var(--dash-bg); border-radius:10px; overflow:hidden; border:1px solid var(--dash-border);">
+                                                <div style="width:84%; height:100%; background:linear-gradient(90deg, var(--primary), var(--secondary)); box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);"></div>
+                                            </div>
+                                        </div>
+                                        <div style="background:var(--success-light-alpha); color:var(--success-dark); padding:12px 20px; border-radius:20px; border:1px solid var(--success-border); text-align:center;">
+                                            <div style="font-size:0.6rem; font-weight:900; opacity:0.8; letter-spacing:1px; color:var(--dash-muted);">STREAK</div>
+                                            <div style="font-size:1.6rem; font-weight:900;">05</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+                                <h2 style="font-size:1.6rem; color:var(--dash-text); margin:0; font-weight:800;"><i class="fa-solid fa-map-location-dot" style="color:var(--primary); margin-right:10px;"></i> Active Missions</h2>
+                                <span style="background:var(--dash-border); padding:6px 15px; border-radius:12px; font-size:0.7rem; font-weight:900; color:var(--dash-muted); letter-spacing:1px;">ACCESS_GRANTED: 10+ MISSIONS</span>
+                            </div>
+
+                            <!-- THE FULL GAME GRID (Restored) -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                                
+                                <div class="mission-card" onclick="window.open('game5.html', '_blank')" style="border: 2px solid var(--secondary); background: linear-gradient(135deg, rgba(236, 72, 153, 0.05), rgba(99, 102, 241, 0.05));">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                        <div style="width:55px; height:55px; background:rgba(236, 72, 153, 0.1); color:var(--secondary); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--dash-border);"><i class="fa-solid fa-users-viewfinder"></i></div>
+                                        <span class="difficulty-tag" style="background:var(--secondary); color:white;">MULTIPLAYER</span>
+                                    </div>
+                                    <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Community Battle Arena</h4>
+                                    <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Create rooms and battle friends live! Sync across devices for the ultimate knowledge war.</p>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.75rem; font-weight:900; color:var(--secondary);">LIVE NETWORK ACTIVE</span>
+                                        <span style="font-size:0.8rem; font-weight:900; color:var(--accent); padding: 5px 10px; border-radius: 8px;">HOST ROOM <i class="fa-solid fa-tower-broadcast"></i></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mission-card" onclick="window.open('game1.html', '_blank')">
+                                     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                         <div style="width:55px; height:55px; background:rgba(99, 102, 241, 0.1); color:var(--primary); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--dash-border);"><i class="fa-solid fa-language"></i></div>
+                                         <span class="difficulty-tag" style="background:rgba(99, 102, 241, 0.1); color:var(--primary);">PRACTICE</span>
+                                     </div>
+                                     <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Odia Learning Hub</h4>
+                                     <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Expressive language mastery and cultural literacy training.</p>
+                                     <div style="display:flex; justify-content:space-between; align-items:center;">
+                                         <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+350 CREDITS</span>
+                                         <span style="font-size:0.8rem; font-weight:900; color:var(--accent); padding: 5px 10px; border-radius: 8px;">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                     </div>
+                                 </div>
+
+                                <div class="mission-card" onclick="window.open('game3.html', '_blank')">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                        <div style="width:55px; height:55px; background:var(--primary-light-alpha); color:var(--primary-dark); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--primary-border);"><i class="fa-solid fa-earth-americas"></i></div>
+                                        <span class="difficulty-tag" style="background:var(--success-light-alpha); color:var(--success-dark);">NORMAL</span>
+                                    </div>
+                                    <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">GlobeTrotter Quest</h4>
+                                    <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Intercept coordinates and master global map intel across continents.</p>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+400 CREDITS</span>
+                                        <span style="font-size:0.8rem; font-weight:900; color:var(--accent); padding: 5px 10px; border-radius: 8px;">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" onclick="window.open('game8.html', '_blank')">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                        <div style="width:55px; height:55px; background:var(--warning-light-alpha); color:var(--warning-dark); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--warning-border);"><i class="fa-solid fa-landmark-dome"></i></div>
+                                        <span class="difficulty-tag" style="background:var(--warning-light-alpha); color:var(--warning-dark);">STRATEGY</span>
+                                    </div>
+                                    <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Civics City Builder</h4>
+                                    <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Establish governance and build a functional civilization simulation.</p>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+650 CREDITS</span>
+                                        <span style="font-size:0.8rem; font-weight:900; color:var(--accent);">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" onclick="window.open('game4.html', '_blank')">
+                                     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                                         <div class="mission-icon-container" style="width:55px; height:55px; background:var(--danger-light-alpha); color:var(--danger-dark); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--danger-border);"><i class="fa-solid fa-shield-halved"></i></div>
+                                         <span class="difficulty-tag" style="background:var(--danger-light-alpha); color:var(--danger-dark);">DANGER</span>
+                                     </div>
+                                     <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Cyber Security World</h4>
+                                     <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Defend the mainframe against phishing and hacking threats in real-time.</p>
+                                     <div style="display:flex; justify-content:space-between; align-items:center;">
+                                         <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+800 CREDITS</span>
+                                         <span style="font-size:0.8rem; font-weight:900; color:var(--accent); padding: 5px 10px; border-radius: 8px;">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                     </div>
+                                 </div>
+
+                                <div class="mission-card" onclick="window.open('game5.html', '_blank')">
+                                     <div class="mission-icon-container" style="width:55px; height:55px; background:var(--success-light-alpha); color:var(--success-dark); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--success-border); margin-bottom:15px;"><i class="fa-solid fa-person-praying"></i></div>
+                                     <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Yoga Yoga & Fitness</h4>
+                                     <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Camera-synced posture alignment and biometric wellness training.</p>
+                                     <div style="display:flex; justify-content:space-between; align-items:center;">
+                                         <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+300 CREDITS</span>
+                                         <span style="font-size:0.8rem; font-weight:900; color:var(--accent); padding: 5px 10px; border-radius: 8px;">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                     </div>
+                                </div>
+
+                                <div class="mission-card" onclick="window.open('game9.html', '_blank')">
+                                    <div class="mission-icon-container" style="width:55px; height:55px; background:var(--success-light-alpha); color:var(--success-dark); border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid var(--success-border); margin-bottom:15px;"><i class="fa-solid fa-coins"></i></div>
+                                    <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Economy Tycoon</h4>
+                                    <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Master market patterns and dominate the trade route intelligence.</p>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+500 CREDITS</span>
+                                        <span style="font-size:0.8rem; font-weight:900; color:var(--accent);">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="mission-card" onclick="window.open('game6.html', '_blank')">
+                                    <div style="width:55px; height:55px; background:rgba(234, 88, 12, 0.1); color:#ea580c; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; border:1px solid rgba(234, 88, 12, 0.2); margin-bottom:15px;"><i class="fa-solid fa-chart-line"></i></div>
+                                    <h4 style="margin:0; font-size:1.2rem; color:var(--dash-text); font-weight:800;">Business Management</h4>
+                                    <p style="font-size:0.85rem; color:var(--dash-muted); margin:8px 0 20px 0; line-height:1.5;">Startup city operations. Allocate budgets and manage resources.</p>
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <span style="font-size:0.75rem; font-weight:900; color:var(--primary);">+550 CREDITS</span>
+                                        <span style="font-size:0.8rem; font-weight:900; color:var(--accent);">LAUNCH <i class="fa-solid fa-chevron-right"></i></span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Side HUD Panel -->
+                        <div class="side-hud" style="display:flex; flex-direction:column; gap:25px;">
+                            <!-- Credit Wallet -->
+                            <div style="background: var(--dash-card); border-radius: 20px; padding: 25px; border: 1px solid var(--dash-border); text-align: center; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                                <div style="position: absolute; top:0; right:0; padding:10px; font-size:0.6rem; color:var(--accent); font-weight:900;"><i class="fa-solid fa-circle-dot" style="animation: pulse-glow 2s infinite;"></i> LIVE</div>
+                                <div style="font-size: 1.8rem; color: var(--primary); margin-bottom: 5px;"><i class="fa-solid fa-gem"></i></div>
+                                <div style="font-size: 0.7rem; font-weight: 900; color: var(--dash-muted); letter-spacing: 2px;">CREDIT VAULT</div>
+                                <div id="sideWalletPoints" style="font-size: 2.4rem; font-weight: 900; color: var(--dash-text); margin: 5px 0;">0 <span style="font-size:1rem; opacity:0.6;">PTS</span></div>
+                                <div style="background: var(--dash-bg); padding: 5px 12px; border-radius: 50px; display: inline-block; font-size: 0.6rem; color: var(--primary); font-weight: 900; border: 1px solid var(--dash-border);">UPGRADE_LEVEL_1</div>
+                            </div>
+
+                            <!-- Agent ID Card -->
+                            <div class="qrio-card-premium" style="height: 200px; border-radius: 25px; background: var(--hud-grad); border: 1px solid var(--dash-border); padding: 25px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <div style="position: absolute; top:0; right:0; width:100px; height:100px; background: radial-gradient(circle, rgba(99, 102, 241, 0.1), transparent); filter:blur(20px);"></div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; position:relative;">
+                                    <span style="font-size: 0.75rem; font-weight: 900; color:var(--dash-muted); letter-spacing:1px;">AGENT IDENTITY</span>
+                                    <i class="fa-solid fa-fingerprint" style="color:var(--primary); font-size:1.2rem;"></i>
+                                </div>
+                                <div id="cardIdDisplay" style="font-family: 'Courier New', monospace; font-size: 1.4rem; color: var(--dash-text); text-align: center; letter-spacing: 3px; text-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor:pointer;" onclick="this.innerText = this.getAttribute('data-full-id')" title="Click to Reveal">#### #### #### ####</div>
+                                <div style="position:relative;">
+                                    <div style="font-size: 0.6rem; color: var(--dash-muted); font-weight: 900; letter-spacing:1px;">AUTHORIZATION_KEY</div>
+                                    <div id="cardHolderName" style="font-size: 1.3rem; font-weight:900; color:var(--dash-text); text-transform:uppercase; letter-spacing:2px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.1));">Explorer Agent</div>
+                                </div>
+                            </div>
+
+                            <!-- Real-time HUD Log -->
+                            <div style="background: var(--dash-bg); border-radius: 24px; padding: 20px; border: 1px solid var(--dash-border); font-family: monospace;">
+                                <div style="color: var(--accent); font-size: 0.7rem; font-weight: 800; margin-bottom: 15px; border-bottom: 1px solid var(--dash-border); padding-bottom: 5px;">SYSTEM_LOGS</div>
+                                <div style="font-size: 0.75rem; color: var(--dash-muted); display:flex; flex-direction:column; gap:8px;">
+                                    <div>[<span style="color:var(--primary);">21:44</span>] Auth success...</div>
+                                    <div>[<span style="color:var(--primary);">21:45</span>] Modules loaded.</div>
+                                    <div>[<span style="color:var(--primary);">21:46</span>] Syncing assets...</div>
+                                    <div style="color:var(--accent);">> HUB_STATUS: ONLINE</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-standard" class="tab-content" style="display:none;">
+                    <div style="text-align:center; margin-bottom:40px;">
+                        <h1 style="font-size:3rem; font-weight:900; color:var(--dash-text); margin:0; letter-spacing:-1px;">Play 3D <span style="color:var(--primary);">Learning Games</span></h1>
+                        <p style="color:var(--dash-muted); font-size:1.1rem;">High-performance educational simulation protocols.</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                        <div class="mission-card" onclick="window.open('game3.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#0ea5e9; margin-bottom:15px;"><i class="fa-solid fa-earth-americas"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">GlobeTrotter Quest</h3><p style="color:var(--dash-muted);">Geography intelligence.</p></div>
+                        <div class="mission-card" onclick="window.open('game8.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#f59e0b; margin-bottom:15px;"><i class="fa-solid fa-landmark-dome"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Civics Builder</h3><p style="color:var(--dash-muted);">Governance simulation.</p></div>
+                        <div class="mission-card" onclick="window.open('game9.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#22c55e; margin-bottom:15px;"><i class="fa-solid fa-coins"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Economy Tycoon</h3><p style="color:var(--dash-muted);">Market strategy.</p></div>
+                        <div class="mission-card" onclick="window.open('game1.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:var(--primary); margin-bottom:15px;"><i class="fa-solid fa-flask-vial"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Sonic Lab</h3><p style="color:var(--dash-muted);">Voice chemistry.</p></div>
+                        <div class="mission-card" onclick="window.open('game6.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#f97316; margin-bottom:15px;"><i class="fa-solid fa-chart-line"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Startup City</h3><p style="color:var(--dash-muted);">Business strategy.</p></div>
+                        <div class="mission-card" onclick="window.open('game7.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#ef4444; margin-bottom:15px;"><i class="fa-solid fa-child-reaching"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Fitness Hero</h3><p style="color:var(--dash-muted);">Posture training.</p></div>
+                        <div class="mission-card" onclick="window.open('game10.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#8b5cf6; margin-bottom:15px;"><i class="fa-solid fa-music"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Melody Master</h3><p style="color:var(--dash-muted);">Rhythm learning.</p></div>
+                        <div class="mission-card" onclick="window.open('game2.html', '_blank')"><div class="mission-icon-container" style="font-size:3rem; color:#06b6d4; margin-bottom:15px;"><i class="fa-solid fa-hand-sparkles"></i></div><h3 style="color:var(--dash-text); font-weight:800; margin:0;">Gesture Math</h3><p style="color:var(--dash-muted);">Spatial calculations.</p></div>
+                    </div>
+                </div>
+
+                <!-- SKILL ACADEMY -->
+                <div id="tab-skillverse" class="tab-content" style="display:none;">
+                    <div style="text-align:center; margin-bottom:40px;">
+                        <h1 style="font-size:3rem; font-weight:900; color:var(--dash-text); margin:0;">Skill <span style="color:var(--primary);">Academy</span></h1>
+                        <p style="color:var(--dash-muted);">Master real-world expertise.</p>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+                        <div class="mission-card" onclick="window.open('game4.html', '_blank')"><div style="font-size:3.5rem; color:#ef4444; margin-bottom:20px;"><i class="fa-solid fa-shield-halved"></i></div><h3 style="color:var(--dash-text); font-weight:800;">Cyber Security</h3><p style="color:var(--dash-muted);">Defense protocols.</p></div>
+                        <div class="mission-card" onclick="window.open('game5.html', '_blank')"><div style="font-size:3.5rem; color:#10b981; margin-bottom:20px;"><i class="fa-solid fa-person-praying"></i></div><h3 style="color:var(--dash-text); font-weight:800;">Yoga Wellness</h3><p style="color:var(--dash-muted);">Biometric alignment.</p></div>
+                    </div>
+                </div>
+
+                <!-- AI LAB -->
+                <div id="tab-generator" class="tab-content" style="display:none;">
+                    <div style="max-width: 800px; margin: 50px auto; text-align: center;">
+                        <div style="width:100px; height:100px; background:linear-gradient(135deg, #c026d3, #7e22ce); border-radius:30px; display:flex; align-items:center; justify-content:center; color:white; font-size:4rem; margin:0 auto 30px auto;"><i class="fa-solid fa-sparkles"></i></div>
+                        <h1 style="font-size:3rem; font-weight:900; color:var(--dash-text); margin:0;">AI Mission <span style="color:var(--primary);">Architect</span></h1>
+                        <p style="color:var(--dash-muted); font-size:1.2rem; margin:20px 0 40px 0;">Convert content into playable learning dimensions.</p>
+                        <a href="ai_generator.html" class="btn-play" style="background:linear-gradient(90deg, #c026d3, #7e22ce); padding:20px 40px; font-size:1.2rem; border-radius:15px; color:white; text-decoration:none; font-weight:900;" target="_blank">INITIATE SYNTHESIS <i class="fa-solid fa-bolt"></i></a>
+                    </div>
+                </div>
+
+                <!-- CULTURE ZONE -->
+                <div id="tab-culture" class="tab-content" style="display:none;">
+                    <div class="mission-card" onclick="window.open('culture_hub.html', '_blank')" style="background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(168, 85, 247, 0.1));">
+                        <div style="display:flex; gap:30px; align-items:center;">
+                            <div style="font-size:5rem; color:#f97316;"><i class="fa-solid fa-masks-theater"></i></div>
+                            <div>
+                                <h2 style="color:var(--dash-text);">Indian Culture Game Zone</h2>
+                                <p style="color:var(--dash-muted);">Master dance patterns and musical rhythms.</p>
+                                <span style="background:#f97316; color:white; padding:10px 25px; border-radius:12px; font-weight:900;">ENTER ZONE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-bse" class="tab-content" style="display:none;">
+                    <h1 style="font-size:2.5rem; color:var(--dash-text); margin:0 0 30px 0; font-weight:900;">Regional State Boards</h1>
+                    
+                    <!-- ORIGINAL ACTIVE MODULES -->
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:20px; margin-bottom: 40px;">
+                        <div class="mission-card" onclick="window.open('bse_odisha.html', '_blank')">
+                            <h3 style="color:var(--dash-text); margin-bottom:10px;">BSE Odisha (ଓଡିଶା)</h3>
+                            <p style="color:var(--dash-muted); font-size:0.9rem;">The main gateway to the Odisha academic dimensions.</p>
+                            <span style="color:var(--primary); font-weight:900;">OPEN MODULE <i class="fa-solid fa-chevron-right"></i></span>
+                        </div>
+                        <div class="mission-card" onclick="window.open('odisha_game1.html', '_blank')">
+                            <h3 style="color:var(--dash-text); margin-bottom:10px;">Odia Vocabulary</h3>
+                            <p style="color:var(--dash-muted); font-size:0.9rem;">Chapter-wise language puzzles.</p>
+                        </div>
+                        <div class="mission-card" onclick="window.open('odisha_game2.html', '_blank')">
+                            <h3 style="color:var(--dash-text); margin-bottom:10px;">Ancient Kalinga</h3>
+                            <p style="color:var(--dash-muted); font-size:0.9rem;">History of our roots in 3D.</p>
+                        </div>
+                        <div class="mission-card" onclick="window.open('odisha_game3.html', '_blank')">
+                            <h3 style="color:var(--dash-text); margin-bottom:10px;">Odia Geography</h3>
+                            <p style="color:var(--dash-muted); font-size:0.9rem;">Rivers and mountains of Odisha.</p>
+                        </div>
+                        <div class="mission-card" onclick="window.open('odisha_game4.html', '_blank')">
+                            <h3 style="color:var(--dash-text); margin-bottom:10px;">BSE Math Pro</h3>
+                            <p style="color:var(--dash-muted); font-size:0.9rem;">Curriculum based problems.</p>
+                        </div>
+                        <div class="mission-card" onclick="window.open('odisha_game5.html', '_blank')">
+                            <h3 style="color:var(--dash-text); margin-bottom:10px;">Odia Literature</h3>
+                            <p style="color:var(--dash-muted); font-size:0.9rem;">Interactive poetry & stories.</p>
+                        </div>
+                    </div>
+
+                    <!-- UPCOMING MODULES -->
+                    <h2 style="color:var(--dash-muted); font-size:1.4rem; font-weight:800; margin-bottom: 20px;">Expanding Network (Coming Soon)</h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:15px; opacity:0.6;">
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">CBSE Central</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">ICSE Global</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Maharashtra Board</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Karnataka SSLC</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Tamil Nadu State</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Gujarat Secondary</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">West Bengal Madhyamik</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">UP State Prishad</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Kerala DHSE</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Telangana TSBIE</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Rajasthan BSER</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Punjab PSEB</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Bihar BSEB</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">MP Board Bhopal</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                        <div class="mission-card" style="cursor:not-allowed;">
+                            <h4 style="color:var(--dash-text); margin:0;">Assam HSLC</h4>
+                            <span style="font-size:0.6rem; color:var(--accent); font-weight:900;">COMING_SOON</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCESSIBILITY HUB -->
+                <div id="tab-accessible" class="tab-content" style="display:none;">
+                    <div style="background: linear-gradient(135deg, #0ea5e9, #6366f1); padding: 40px; border-radius: 30px; margin-bottom: 30px; color: white;">
+                        <h1 style="font-size: 2.5rem; margin:0; font-weight:900; color:white;">Accessibility Hub</h1>
+                        <p style="opacity:0.9; margin:10px 0 0 0; color:white;">Empowering learning for every ability with specialized AI tools.</p>
+                    </div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:25px;">
+                        <div class="mission-card" onclick="window.open('game1.html', '_blank')">
+                            <div style="font-size:3.5rem; color:#0ea5e9; margin-bottom:20px;"><i class="fa-solid fa-ear-listen"></i></div>
+                            <h3 style="color:var(--dash-text); font-weight:800;">Audio Lab (Voice AI)</h3>
+                            <p style="color:var(--dash-muted);">Full chemistry lab controlled entirely by voice for visually impaired agents.</p>
+                        </div>
+                        <div class="mission-card" onclick="window.open('game2.html', '_blank')">
+                            <div style="font-size:3.5rem; color:#6366f1; margin-bottom:20px;"><i class="fa-solid fa-hands-asl-interpreting"></i></div>
+                            <h3 style="color:var(--dash-text); font-weight:800;">Gesture Control Math</h3>
+                            <p style="color:var(--dash-muted);">Solve complex geometry using only hand gestures and webcam AI.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QRIO SWAG SHOP -->
+                <div id="tab-shop" class="tab-content" style="display:none;">
+                    <div style="background: linear-gradient(135deg, #4f46e5, #ec4899); padding: 40px; border-radius: 30px; margin-bottom: 30px; color: white; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h1 style="font-size: 2.5rem; margin:0; font-weight:900; color:white;">Qrio Swag Hub</h1>
+                            <p style="opacity:0.9; margin:10px 0 0 0; color:white;">Redeem your mission credits for exclusive gear & study material.</p>
+                        </div>
+                        <div style="font-size:4rem; opacity:0.2;"><i class="fa-solid fa-cart-shopping"></i></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px;">
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-pen-nib"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Alpha Pro Pen</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Special edition mission pen.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">500 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-shirt"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Explorer T-Shirt</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Premium cotton team gear.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">2500 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--accent);"><i class="fa-solid fa-clock"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Quantum Watch</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Syncs with Mission HUD.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">5000 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-bag-shopping"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Hero Backpack</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Waterproof & spacious.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">3500 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-book"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Mission Logbook</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Premium dotted paper.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">800 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--accent);"><i class="fa-solid fa-bottle-water"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Hydrate Pro</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Steel vacuum flask.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">1200 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-headphones"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Nano Buds</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Deep bass study buds.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">4000 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-hat-cowboy"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Stealth Cap</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Adjustable tech-fabric.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">1500 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--accent);"><i class="fa-solid fa-rocket"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Mini Qrio</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">3D Desktop companion.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">2000 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-socks"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Grip Socks</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Safe-step technology.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">400 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-lightbulb"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Desk Beam</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Smart RGB study light.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">1800 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--accent);"><i class="fa-solid fa-keyboard"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Mech Board</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Ultra-fast response time.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">6000 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-file-pdf"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Exam Prep Kit</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">All boards coverage.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">350 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-shapes"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Geometry Box</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Pro mathematical tools.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">500 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--accent);"><i class="fa-solid fa-calculator"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Sci-Calculator</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Solar-powered tech.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">4500 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-mug-saucer"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Energy Mug</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Ceramic mission grade.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">550 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-scissors"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Craft Pro Kit</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Safe-edge tools.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">850 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--accent);"><i class="fa-solid fa-compass-drafting"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Map Quest Set</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Physical world maps.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">1100 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--primary);"><i class="fa-solid fa-stapler"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Nano Stapler</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">Compact mission binder.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">400 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="mission-card" style="text-align:center;">
+                            <div style="font-size:3rem; margin-bottom:15px; color:var(--secondary);"><i class="fa-solid fa-puzzle-piece"></i></div>
+                            <h4 style="color:var(--dash-text); margin:0;">Logic Puzzle</h4>
+                            <p style="font-size:0.8rem; color:var(--dash-muted); margin:5px 0 15px 0;">IQ booster challenge.</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-weight:900; color:var(--primary);">750 PTS</span>
+                                <button style="background:var(--primary); border:none; color:white; width:40px; height:40px; border-radius:12px; cursor:pointer;"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+
+        </div>
+    </div>
+
+
+    <!-- 3JS Background Logic -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // --- Custom Gaming Functions ---
+
+        function showGameNotify(text, type = 'success') {
+            const notify = document.getElementById('gameNotify');
+            const notifyText = document.getElementById('notifyText');
+            const icon = notify.querySelector('i');
+            
+            notifyText.innerText = text;
+            
+            if(type === 'error') {
+                notify.style.borderColor = '#ef4444';
+                notify.style.boxShadow = '0 0 40px rgba(239, 68, 68, 0.5)';
+                icon.className = 'fa-solid fa-triangle-exclamation';
+            } else {
+                notify.style.borderColor = '#6366f1';
+                notify.style.boxShadow = '0 0 40px rgba(99, 102, 241, 0.5)';
+                icon.className = 'fa-solid fa-gamepad';
+            }
+
+            notify.classList.add('active');
+            
+            // SFX Simulation (Visual Pulse)
+            gsap.to(notify, { scale: 1.1, duration: 0.1, yoyo: true, repeat: 1 });
+
+            setTimeout(() => {
+                notify.classList.remove('active');
+            }, 3000);
+        }
+
+        // --- Init AOS ---
+        AOS.init({
+            duration: 1000,
+            once: true,
+            easing: 'ease-out-back'
+        });
+
+        // Init Three.js subtle gaming background
+        const canvas = document.getElementById('bgCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
+        camera.position.z = 400;
+
+        // Create colorful gaming particles
+        const geometry = new THREE.IcosahedronGeometry(2, 0);
+        const group = new THREE.Group();
+        const colors = [0x6366f1, 0xec4899, 0x818cf8, 0x10b981];
+
+        for (let i = 0; i < 250; i++) {
+            const material = new THREE.MeshBasicMaterial({ 
+                color: colors[Math.floor(Math.random() * colors.length)], 
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            });
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x = (Math.random() - 0.5) * 1200;
+            mesh.position.y = (Math.random() - 0.5) * 1200;
+            mesh.position.z = (Math.random() - 0.5) * 1200;
+            mesh.scale.setScalar(Math.random() * 2 + 1);
+            group.add(mesh);
+        }
+        scene.add(group);
+
+        function updateParticles(color) {
+            group.children.forEach(mesh => {
+                gsap.to(mesh.material.color, {
+                    r: new THREE.Color(color).r,
+                    g: new THREE.Color(color).g,
+                    b: new THREE.Color(color).b,
+                    duration: 1
+                });
+            });
+        }
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            group.rotation.x += 0.001;
+            group.rotation.y += 0.0015;
+            
+            // Add slight mouse interactivity
+            group.position.x += (mouseX - group.position.x) * 0.05;
+            group.position.y += (-mouseY - group.position.y) * 0.05;
+            
+            renderer.render(scene, camera);
+        }
+
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) / 20;
+            mouseY = (e.clientY - window.innerHeight / 2) / 20;
+        });
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- App Logic ---
+
+        // --- Theme Logic ---
+        function toggleTheme() {
+            const body = document.documentElement;
+            const currentTheme = body.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            const landingIcon = document.querySelector('#themeToggle i');
+            const dashToggle = document.getElementById('dashThemeToggle');
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('qrio-theme', newTheme);
+            
+            if(newTheme === 'dark') {
+                if(landingIcon) landingIcon.className = 'fa-solid fa-sun';
+                if(dashToggle) dashToggle.innerHTML = '<i class="fa-solid fa-sun"></i> Light Interface';
+                updateParticles(0xf8fafc);
+            } else {
+                if(landingIcon) landingIcon.className = 'fa-solid fa-moon';
+                if(dashToggle) dashToggle.innerHTML = '<i class="fa-solid fa-moon"></i> Dark Interface';
+                updateParticles(0x6366f1);
+            }
+            
+            showGameNotify(`Switched to ${newTheme} mode`, 'success');
+        }
+
+        // Initialize theme from localStorage
+        window.addEventListener('load', async () => {
+            const savedTheme = localStorage.getItem('qrio-theme') || 'light';
+            const landingIcon = document.querySelector('#themeToggle i');
+            const dashToggle = document.getElementById('dashThemeToggle');
+
+            if(savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                if(landingIcon) landingIcon.className = 'fa-solid fa-sun';
+                if(dashToggle) dashToggle.innerHTML = '<i class="fa-solid fa-sun"></i> Light Interface';
+                updateParticles(0xf8fafc);
+            } else {
+                if(dashToggle) dashToggle.innerHTML = '<i class="fa-solid fa-moon"></i> Dark Interface';
+            }
+
+            // --- SESSION RECOVERY (Auto-Login on Refresh) ---
+            const activeId = localStorage.getItem('qrio_active_id');
+            if (activeId) {
+                try {
+                    const response = await fetch(`http://localhost:5000/api/points/${activeId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const userName = data.name || "Agent";
+                        
+                        // Populate New Mission Control Elements
+                        if(document.getElementById('welcomeNameDisplay')) document.getElementById('welcomeNameDisplay').innerText = userName;
+                        if(document.getElementById('sideNavName')) document.getElementById('sideNavName').innerText = userName;
+                        if(document.getElementById('cardHolderName')) document.getElementById('cardHolderName').innerText = userName;
+                        if(document.getElementById('cardIdDisplay')) document.getElementById('cardIdDisplay').innerText = formatIdForCard(activeId);
+                        if(document.getElementById('sideNavAvatar')) document.getElementById('sideNavAvatar').src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${userName}`;
+                        if(document.getElementById('sideWalletPoints')) document.getElementById('sideWalletPoints').innerText = data.points + " pts";
+                        
+                        // Populate legacy score if exists
+                        if(document.getElementById('userScoreDisplay')) document.getElementById('userScoreDisplay').innerText = "Points: " + data.points;
+
+                        // Navigate silently or with notification
+                        navigateTo('dashboardView');
+                        showGameNotify(`Welcome back, Agent ${userName}.`, 'success');
+                    }
+                } catch (e) {
+                    console.warn("Session pulse failed. Proceeding to surface.");
+                }
+            }
+        });
+
+        function navigateTo(viewId) {
+            const currentView = document.querySelector('.view.active');
+            const nextView = document.getElementById(viewId);
+            const mainNav = document.getElementById('mainNav');
+            
+            // Hide/Show global nav
+            if (viewId === 'landingView') {
+                mainNav.style.display = 'flex';
+                setTimeout(() => mainNav.style.opacity = '1', 10);
+            } else {
+                mainNav.style.opacity = '0';
+                setTimeout(() => mainNav.style.display = 'none', 300);
+                // Ensure landing is totally out
+                document.getElementById('landingView').style.display = 'none';
+            }
+
+            if (currentView === nextView) return;
+
+            gsap.to(currentView, {
+                opacity: 0,
+                y: -10,
+                duration: 0.3,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    currentView.classList.remove('active');
+                    currentView.style.display = 'none';
+                    
+                    nextView.style.display = 'flex';
+                    nextView.style.opacity = 0;
+                    nextView.style.transform = 'translateY(10px)';
+                    nextView.classList.add('active');
+                    
+                    gsap.to(nextView, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: "power2.out",
+                        onComplete: () => {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    });
+                }
+            });
+        }
+
+        function goToSection(sectionId) {
+            if (!document.getElementById('landingView').classList.contains('active')) {
+                navigateTo('landingView');
+                setTimeout(() => {
+                    const section = document.getElementById(sectionId);
+                    if (section) section.scrollIntoView({ behavior: 'smooth' });
+                }, 600);
+            } else {
+                const section = document.getElementById(sectionId);
+                if (section) section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+
+        function toggleAuth() {
+            const card = document.getElementById('authCard');
+            card.classList.toggle('flipped');
+        }
+
+        function togglePasswordVis(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function validateFields(inputs) {
+            let isValid = true;
+            inputs.forEach(input => {
+                if (input.value.trim() === '') {
+                    input.classList.add('error-border');
+                    isValid = false;
+                } else {
+                    input.classList.remove('error-border');
+                }
+            });
+            return isValid;
+        }
+
+        // Real-time clearance of red borders
+        document.querySelectorAll('.auth-form input').forEach(input => {
+            input.addEventListener('input', function () {
+                if (this.value.trim() !== '') {
+                    this.classList.remove('error-border');
+                }
+            });
+        });
+
+        async function handleGoogleAuth() {
+            showGameNotify('Handshaking with Google...', 'success');
+            
+            // Register/Login Google User in backend to prevent 404s
+            const googleUser = {
+                userId: 'google_explorer',
+                name: 'Google Explorer',
+                password: 'google_secure_token_123'
+            };
+
+            try {
+                // Try to signup (if exists, it will return 409, which we catch or handle)
+                const signupRes = await fetch('http://localhost:5000/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(googleUser)
+                });
+                
+                // Even if it fails (already exists), we just proceed to login state
+                const response = await fetch('http://localhost:5000/api/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: googleUser.userId, password: googleUser.password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('qrio_active_id', data.uniqueId);
+                    
+                    // Safe element updates
+                    const updateText = (id, text) => {
+                        const el = document.getElementById(id);
+                        if (el) el.innerText = text;
+                    };
+
+                    // Update Sidebar Content
+                    updateText('sideNavName', data.name);
+                    updateText('welcomeNameDisplay', data.name);
+                    updateText('sideWalletPoints', data.points + " pts");
+                    updateText('cardHolderName', data.name);
+                    updateText('cardIdDisplay', formatIdForCard(data.uniqueId));
+                    if(document.getElementById('sideNavAvatar')) document.getElementById('sideNavAvatar').src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${data.name}`;
+
+                    showGameNotify('Google Mission Link Secure. Welcome back Agent.', 'success');
+                    navigateTo('dashboardView');
+                }
+            } catch (err) {
+                console.error("Google Auth Error:", err);
+                showGameNotify('Google Auth failed. Offline?', 'error');
+            }
+        }
+
+        function formatIdForCard(id) {
+            if (!id) return "•••• •••• •••• ••••";
+            const str = String(id).padStart(16, '0');
+            // Store full ID in data attribute for reveal
+            const display = document.getElementById('cardIdDisplay');
+            if(display) display.setAttribute('data-full-id', str.match(/.{1,4}/g).join(' '));
+            
+            // Mask first 12 digits
+            const masked = "•••• •••• •••• " + str.slice(-4);
+            return masked;
+        }
+
+        async function handleAuth(e, type) {
+            e.preventDefault();
+
+            let uniqueId;
+            let currentPoints = 0;
+            let submitBtn = document.getElementById(type === 'signin' ? 'btn-signin' : 'btn-signup');
+            let spinner = document.getElementById(type === 'signin' ? 'spin-signin' : 'spin-signup');
+            let btnText = submitBtn.querySelector('.btn-text');
+
+            if (type === 'signup') {
+                const nameInput = document.getElementById('signup-name');
+                const userIdInput = document.getElementById('signup-id');
+                const passInput = document.getElementById('signup-pwd');
+                const errElement = document.getElementById('signup-err');
+
+                if (!validateFields([nameInput, userIdInput, passInput])) {
+                    errElement.innerText = "Please fill in all fields.";
+                    errElement.style.display = "block";
+                    return;
+                }
+                errElement.style.display = "none";
+
+                const name = nameInput.value;
+                const userId = userIdInput.value.trim();
+                const password = passInput.value;
+
+                // Loading State
+                spinner.style.display = 'inline-block';
+                btnText.innerText = 'Creating...';
+                submitBtn.style.pointerEvents = 'none';
+
+                try {
+                    const response = await fetch('http://localhost:5000/api/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, userId, password })
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        errElement.innerText = `Sign Up Failed: ${data.message}`;
+                        errElement.style.display = "block";
+                        resetBtnState();
+                        return;
+                    }
+
+                    uniqueId = data.uniqueId;
+                    currentPoints = data.points;
+                    let uName = data.name || name || uniqueId;
+                    
+                    // Populate New Mission Control Elements
+                    if(document.getElementById('welcomeNameDisplay')) document.getElementById('welcomeNameDisplay').innerText = uName;
+                    if(document.getElementById('sideNavName')) document.getElementById('sideNavName').innerText = uName;
+                    if(document.getElementById('cardHolderName')) document.getElementById('cardHolderName').innerText = uName;
+                    if(document.getElementById('cardIdDisplay')) document.getElementById('cardIdDisplay').innerText = formatIdForCard(uniqueId);
+                    if(document.getElementById('sideNavAvatar')) document.getElementById('sideNavAvatar').src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${uName}`;
+
+                    showGameNotify(`Signed up successfully! Welcome Agent!`, 'success');
+                } catch (error) {
+                    showGameNotify('Error connecting to Server.', 'error');
+                    resetBtnState();
+                    return;
+                }
+            } else {
+                // Sign In mode
+                const userIdInput = document.getElementById('signin-id');
+                const passInput = document.getElementById('signin-pwd');
+                const errElement = document.getElementById('signin-err');
+
+                if (!validateFields([userIdInput, passInput])) {
+                    errElement.innerText = "Please fill in all fields.";
+                    errElement.style.display = "block";
+                    return;
+                }
+                errElement.style.display = "none";
+
+                const providedId = userIdInput.value.trim();
+                const password = passInput.value;
+
+                // Loading State
+                spinner.style.display = 'inline-block';
+                btnText.innerText = 'Authenticating...';
+                submitBtn.style.pointerEvents = 'none';
+
+                try {
+                    const response = await fetch('http://localhost:5000/api/signin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: providedId, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        uniqueId = data.uniqueId;
+                        currentPoints = data.points;
+                        let uName = data.name || uniqueId;
+                        
+                        // Populate New Mission Control Elements
+                        if(document.getElementById('welcomeNameDisplay')) document.getElementById('welcomeNameDisplay').innerText = uName;
+                        if(document.getElementById('sideNavName')) document.getElementById('sideNavName').innerText = uName;
+                        if(document.getElementById('cardHolderName')) document.getElementById('cardHolderName').innerText = uName;
+                        if(document.getElementById('cardIdDisplay')) document.getElementById('cardIdDisplay').innerText = formatIdForCard(uniqueId);
+                        if(document.getElementById('sideNavAvatar')) document.getElementById('sideNavAvatar').src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${uName}`;
+
+                        showGameNotify(`Access Granted. Welcome back Agent.`, 'success');
+                        // Minor delay for loading visual effect
+                        await new Promise(r => setTimeout(r, 800));
+                    } else {
+                        errElement.innerText = data.message;
+                        errElement.style.display = "block";
+                        showGameNotify(data.message, 'error');
+                        resetBtnState();
+                        return;
+                    }
+                } catch (error) {
+                    showGameNotify('Error connecting to Server.', 'error');
+                    resetBtnState();
+                    return;
+                }
+            }
+
+            function resetBtnState() {
+                spinner.style.display = 'none';
+                btnText.innerText = type === 'signin' ? 'Log In' : 'Join Qrio';
+                submitBtn.style.pointerEvents = 'all';
+            }
+
+            // Sync State
+            resetBtnState();
+
+            // Centralized Store ID and sync points locally
+            localStorage.setItem('qrio_active_id', uniqueId);
+
+            document.getElementById('userScoreDisplay').innerText = "Points: " + currentPoints;
+            document.getElementById('totalPointsBoard').innerText = "Total: " + currentPoints + " pts";
+
+            // Reset forms
+            document.getElementById('signInForm').reset();
+            document.getElementById('signUpForm').reset();
+
+            // Go to Dashboard
+            navigateTo('dashboardView');
+            
+            // Initializing Welcome Animation
+            setTimeout(() => {
+                 document.getElementById('navUsername').classList.add('pulse-name');
+                 setTimeout(() => document.getElementById('navUsername').classList.remove('pulse-name'), 3000);
+            }, 1000);
+
+        }
+
+        async function redeemPoints(points) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            
+            // Visual Feedback
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+            btn.style.opacity = '0.7';
+
+            const userId = localStorage.getItem('qrio_active_id');
+            if (!userId) {
+                showGameNotify("Identity missing. Please re-login.", "error");
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/points/redeem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, points })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    showGameNotify(data.message, "success");
+                    
+                    // Update all UI points displays
+                    const updatePoints = (val) => {
+                        const scoreEl = document.getElementById('userScoreDisplay');
+                        const boardEl = document.getElementById('totalPointsBoard');
+                        if (scoreEl) scoreEl.innerText = "Points: " + val;
+                        if (boardEl) boardEl.innerText = "Total: " + val + " pts";
+                    };
+                    updatePoints(data.totalPoints);
+                    updateText('sideWalletPoints', data.totalPoints + " pts");
+                    
+                    // Success Burst Animation
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> SECURED!';
+                    btn.style.background = 'var(--accent)';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        btn.style.background = '';
+                        btn.style.opacity = '1';
+                    }, 2000);
+                } else {
+                    showGameNotify(data.error, "error");
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                }
+            } catch (err) {
+                console.error("Redemption Failure:", err);
+                showGameNotify("Network breach detected. Check connection.", "error");
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+            }
+        }
+
+        // Live Scoreboard Simulation
+        setInterval(() => {
+            const scores = ["1,890 XP", "2,140 XP", "1,950 XP", "2,400 XP"];
+            const randomScore = scores[Math.floor(Math.random() * scores.length)];
+            const mathScore = document.querySelector('#liveScoreboard div:nth-child(2) span:nth-child(2)');
+            if (mathScore) {
+                gsap.to(mathScore, { opacity: 0, scale: 0.9, duration: 0.2, onComplete: () => {
+                    mathScore.innerText = randomScore;
+                    gsap.to(mathScore, { opacity: 1, scale: 1, duration: 0.2 });
+                }});
+            }
+        }, 8000);
+            
+
+        function logout() {
+            localStorage.removeItem('qrio_active_id');
+            navigateTo('authView');
+        }
+
+
+        async function completeTask(checkbox, pts) {
+            checkbox.disabled = true; // prevent toggling back
+            checkbox.nextElementSibling.nextElementSibling.style.color = '#10b981'; // turns to green
+            let comp = document.querySelectorAll('.task-check:checked').length;
+            document.getElementById('taskProgress').style.width = (comp / 3 * 100) + '%';
+            document.getElementById('taskText').innerText = comp + '/3 Tasks Completed';
+
+            let activeId = localStorage.getItem('qrio_active_id');
+            if (activeId && checkbox.checked) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: pts })
+                }).catch(console.error);
+            }
+        }
+
+        // Live Points Sync
+        setInterval(async () => {
+            let activeId = localStorage.getItem('qrio_active_id');
+            if (activeId) {
+                try {
+                    const response = await fetch(`http://localhost:5000/api/points/${activeId}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        let walletDisplay = document.getElementById('sideWalletPoints');
+                        if (walletDisplay) walletDisplay.innerText = data.points + " pts";
+                        
+                        // Keep legacy score for background elements if any
+                        let scoreDisplay = document.getElementById('userScoreDisplay');
+                        if (scoreDisplay) scoreDisplay.innerText = "Points: " + data.points;
+                    }
+                } catch (e) {
+                    console.warn("Points sync failed");
+                }
+            }
+        }, 1500); // Polling every 1.5s
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('sideOverlay');
+            sidebar.classList.toggle('drawer-open');
+            overlay.classList.toggle('active');
+        }
+
+        function switchTab(tabId, btn) {
+            // Close mobile menu if open
+            const sidebar = document.getElementById('mainSidebar');
+            if(sidebar.classList.contains('drawer-open')) toggleMobileMenu();
+            
+            // Hide all
+            const currentTab = document.querySelector('.tab-content.active');
+            const nextTab = document.getElementById(tabId);
+
+            if (currentTab === nextTab) return;
+
+            // Clear all active states from sidebars and mobile bars
+            document.querySelectorAll('.side-tab-btn, .mobile-nav-btn').forEach(b => b.classList.remove('active'));
+            
+            // Activate the button(s) that match the tabId
+            document.querySelectorAll(`[onclick*="${tabId}"]`).forEach(b => b.classList.add('active'));
+
+            gsap.to(currentTab, {
+                opacity: 0,
+                y: -10,
+                duration: 0.3,
+                ease: "power2.inOut",
+                onComplete: () => {
+                    currentTab.classList.remove('active');
+                    currentTab.style.display = 'none';
+
+                    nextTab.style.display = (tabId === 'tab-overview') ? 'block' : 'block'; 
+                    nextTab.style.opacity = 0;
+                    nextTab.style.transform = 'translateY(10px)';
+                    nextTab.classList.add('active');
+
+                    gsap.to(nextTab, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                }
+            });
+        }
+
+        // --- Blob Animation ---
+        gsap.to("#blob1", {
+            x: '30vw',
+            y: '20vh',
+            duration: 20,
+            repeat: -1,
+            yoyo: true,
+            ease: "none"
+        });
+        gsap.to("#blob2", {
+            x: '-20vw',
+            y: '-10vh',
+            duration: 15,
+            repeat: -1,
+            yoyo: true,
+            ease: "none"
+        });
+
+        // --- Entrance Animations ---
+        window.addEventListener('load', () => {
+            gsap.from("#hero-title", { opacity: 0, y: 30, duration: 1, delay: 0.5 });
+            gsap.from("#hero-subtitle", { opacity: 0, y: 20, duration: 1, delay: 0.8 });
+            gsap.from(".hero-btns", { opacity: 0, scale: 0.9, duration: 0.8, delay: 1.2 });
+            gsap.from("nav", { y: -100, opacity: 0, duration: 1 });
+        });
+    </script>
+
+
+    <script>
+        // --- Masty Chatbot Logic ---
+        let chatOpen = false;
+        function toggleChat() {
+            const win = document.getElementById('chatWindow');
+            chatOpen = !chatOpen;
+            win.style.display = chatOpen ? 'flex' : 'none';
+        }
+
+        // Draggable Logic
+        let isDragging = false;
+        let startX, startY;
+
+        function startDrag(e) {
+            isDragging = true;
+            const event = e.type === 'touchstart' ? e.touches[0] : e;
+            startX = event.clientX - mastyBot.offsetLeft;
+            startY = event.clientY - mastyBot.offsetTop;
+            
+            document.onmousemove = doDrag;
+            document.ontouchmove = doDrag;
+            document.onmouseup = stopDrag;
+            document.ontouchend = stopDrag;
+        }
+
+        function doDrag(e) {
+            if (!isDragging) return;
+            const event = e.type === 'touchmove' ? e.touches[0] : e;
+            let left = event.clientX - startX;
+            let top = event.clientY - startY;
+            
+            // Constrain
+            left = Math.max(0, Math.min(window.innerWidth - 80, left));
+            top = Math.max(0, Math.min(window.innerHeight - 80, top));
+            
+            mastyBot.style.left = left + 'px';
+            mastyBot.style.top = top + 'px';
+            mastyBot.style.right = 'auto';
+            mastyBot.style.bottom = 'auto';
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.onmousemove = null;
+            document.ontouchmove = null;
+        }
+
+        const mastyResponses = [
+            "Oye! Padhai kar raha hai ya surf scroll? 🙄",
+            "Game khelna hai toh bol, shortcut bataunga! 🎮",
+            "Main robot hoon, but mere pass tera report card hai (just kidding, it's safe... maybe) 😂",
+            "Mission Credits accumulate ho rahe hain? Ya sab shopping mein uda diya? 💸",
+            "Agent, you look sharp today! (Actually I can't see but my AI says so) 😎",
+            "Masty mode ON! 🚀",
+            "BSE Odisha ke games try kiye? Odisha representation is lit! 🔥",
+            "Doubt hai? Toh Google mat kar, mera dimaag kha! 🧠",
+            "Yoga game khel le, tera dimaag thanda hoga! 🧘‍♂️"
+        ];
+
+        function sendMsg() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            addMsg(text, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const response = mastyResponses[Math.floor(Math.random() * mastyResponses.length)];
+                addMsg(response, 'bot');
+            }, 800);
+        }
+
+        function addMsg(text, sender) {
+            const msgs = document.getElementById('chatMsgs');
+            const div = document.createElement('div');
+            div.className = `msg ${sender}`;
+            div.innerText = text;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

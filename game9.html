@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economy Tycoon - QRIO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        body {
+            margin: 0;
+            background: #dcfce7;
+            color: #064e3b;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid #bbf7d0;
+        }
+
+        .hud {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat h3 {
+            color: #059669;
+            margin: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .stat p {
+            margin: 5px 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #065f46;
+        }
+
+        .btn-exit {
+            background: transparent;
+            color: #059669;
+            border: 2px solid #059669;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Outfit';
+        }
+
+        .btn-exit:hover {
+            background: #059669;
+            color: white;
+        }
+
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .market-board {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .commodity-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 2px solid #bbf7d0;
+            transition: transform 0.3s;
+        }
+
+        .commodity-card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #047857;
+        }
+
+        .price-tag {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+            color: #10b981;
+        }
+
+        .inventory-tag {
+            color: #64748b;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .btn-trade {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit';
+            width: 45%;
+        }
+
+        .btn-buy {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-buy:hover:not(:disabled) {
+            background: #2563eb;
+        }
+
+        .btn-sell {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-sell:hover:not(:disabled) {
+            background: #d97706;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            margin-top: 40px;
+            background: white;
+            padding: 20px 40px;
+            border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-next {
+            background: #059669;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit';
+        }
+
+        .btn-next:hover {
+            transform: scale(1.05);
+            background: #047857;
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(220, 252, 231, 0.95);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-over h1 {
+            color: #047857;
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-restart {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div style="font-weight: 900; font-size: 1.5rem;"><i class="fa-solid fa-coins"></i> Economy Tycoon</div>
+        <div class="hud">
+            <div class="stat">
+                <h3>Capital</h3>
+                <p id="stat-money">$500</p>
+            </div>
+            <div class="stat">
+                <h3>Day</h3>
+                <p id="stat-day">1 / 15</p>
+            </div>
+            <div class="stat">
+                <h3>Score</h3>
+                <p id="stat-score" style="color:#059669;">0 px</p>
+            </div>
+        </div>
+        <button class="btn-exit" onclick="window.close()">Exit Market</button>
+    </nav>
+
+    <div class="game-area">
+        <h1 style="color: #047857; margin-bottom: 30px;">Goal: Reach $1500 in 15 Days</h1>
+
+        <div class="market-board">
+            <!-- Tech Stock -->
+            <div class="commodity-card">
+                <h2>Tech Stocks</h2>
+                <div class="price-tag" id="price-tech">$100</div>
+                <div class="inventory-tag">Owned: <span id="inv-tech">0</span></div>
+                <button class="btn-trade btn-buy" id="btn-buy-tech" onclick="trade('tech', 'buy')">Buy</button>
+                <button class="btn-trade btn-sell" id="btn-sell-tech" onclick="trade('tech', 'sell')">Sell</button>
+            </div>
+
+            <!-- Gold -->
+            <div class="commodity-card">
+                <h2>Gold Ounces</h2>
+                <div class="price-tag" id="price-gold">$250</div>
+                <div class="inventory-tag">Owned: <span id="inv-gold">0</span></div>
+                <button class="btn-trade btn-buy" id="btn-buy-gold" onclick="trade('gold', 'buy')">Buy</button>
+                <button class="btn-trade btn-sell" id="btn-sell-gold" onclick="trade('gold', 'sell')">Sell</button>
+            </div>
+
+            <!-- Oil -->
+            <div class="commodity-card">
+                <h2>Oil Barrels</h2>
+                <div class="price-tag" id="price-oil">$50</div>
+                <div class="inventory-tag">Owned: <span id="inv-oil">0</span></div>
+                <button class="btn-trade btn-buy" id="btn-buy-oil" onclick="trade('oil', 'buy')">Buy</button>
+                <button class="btn-trade btn-sell" id="btn-sell-oil" onclick="trade('oil', 'sell')">Sell</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-next" onclick="nextDay()">Advance to Next Day &rarr;</button>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOverScreen">
+        <h1 id="goTitle">Market Closed</h1>
+        <p id="goReason" style="font-size: 1.5rem;"></p>
+        <p id="goScore" style="font-weight:bold; font-size:2rem; color:#059669;">Final Score: 0 px</p>
+        <button class="btn-restart" onclick="location.reload()">Play Again</button>
+    </div>
+
+    <script>
+        let money = 500;
+        let day = 1;
+        const MAX_DAYS = 15;
+        let score = 0;
+
+        const market = {
+            tech: { price: 100, owned: 0, min: 20, max: 250, volatility: 40 },
+            gold: { price: 250, owned: 0, min: 150, max: 500, volatility: 60 },
+            oil: { price: 50, owned: 0, min: 10, max: 150, volatility: 25 }
+        };
+
+        function updateUI() {
+            document.getElementById('stat-money').innerText = "$" + money;
+            document.getElementById('stat-day').innerText = `${day} / ${MAX_DAYS}`;
+            document.getElementById('stat-score').innerText = score + " px";
+
+            for (let key in market) {
+                document.getElementById(`price-${key}`).innerText = "$" + market[key].price;
+                document.getElementById(`inv-${key}`).innerText = market[key].owned;
+
+                document.getElementById(`btn-buy-${key}`).disabled = money < market[key].price;
+                document.getElementById(`btn-sell-${key}`).disabled = market[key].owned <= 0;
+            }
+
+            if (day > MAX_DAYS) {
+                endGame();
+            }
+        }
+
+        function trade(item, action) {
+            let cost = market[item].price;
+            if (action === 'buy' && money >= cost) {
+                money -= cost;
+                market[item].owned++;
+            } else if (action === 'sell' && market[item].owned > 0) {
+                money += cost;
+                market[item].owned--;
+            }
+            updateUI();
+        }
+
+        function nextDay() {
+            day++;
+            // Fluctuate prices
+            for (let key in market) {
+                let change = Math.floor(Math.random() * (market[key].volatility * 2)) - market[key].volatility;
+                market[key].price += change;
+                if (market[key].price < market[key].min) market[key].price = market[key].min;
+                if (market[key].price > market[key].max) market[key].price = market[key].max;
+            }
+            updateUI();
+        }
+
+        function awardPoints(amount) {
+            score += amount;
+            let activeId = localStorage.getItem('QRIO_active_id');
+            if (activeId) {
+                fetch('http://localhost:5000/api/points', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: activeId, pointsToAdd: amount })
+                }).catch(console.error);
+            }
+        }
+
+        function endGame() {
+            // Liquidate assets
+            for (let key in market) {
+                money += market[key].price * market[key].owned;
+                market[key].owned = 0;
+            }
+
+            let won = money >= 1500;
+            if (won) {
+                awardPoints(200);
+            } else {
+                awardPoints(50); // Participation
+            }
+
+            document.querySelector('.game-area').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'flex';
+            document.getElementById('goTitle').innerText = won ? "Tycoon Status Achieved!" : "Market Closed";
+            document.getElementById('goReason').innerText = `You ended with $${money}. Goal was $1500.`;
+            document.getElementById('goScore').innerText = `Final Score: ${score} px`;
+        }
+
+        updateUI();
+    </script>
+</body>
+
+</html>

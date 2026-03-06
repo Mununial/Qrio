@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qrio Community Battle Arena</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --bg-dark: #0a0314;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #0a0314 100%);
+        }
+
+        #battle-app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .battle-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .lobby-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #6366f1, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { transform: scale(1.02); background: var(--secondary); }
+
+        .player-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        .game-area { display: none; width: 100%; max-width: 600px; }
+        .question-box { font-size: 1.5rem; margin-bottom: 30px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        #leaderboard {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            background: var(--glass);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="battle-app">
+        <!-- Lobby Section -->
+        <div id="lobby" class="battle-card">
+            <h1 class="lobby-title">BATTLE ARENA</h1>
+            <input type="text" id="playerName" placeholder="Enter Your Agent Name">
+            <input type="text" id="roomId" placeholder="Enter Room ID (e.g. QRIO123)">
+            <div style="display:flex; gap:10px;">
+                <button onclick="createRoom()">CREATE ROOM</button>
+                <button onclick="joinRoom()" style="background:var(--secondary);">JOIN ROOM</button>
+            </div>
+            
+            <div id="roomInfo" style="display:none; margin-top:20px;">
+                <h3 style="color:var(--primary);">Room: <span id="currentRoomId"></span></h3>
+                <div class="player-list" id="playerList"></div>
+                <button id="startBtn" onclick="startGame()" style="background:linear-gradient(90deg, #10b981, #059669); display:none;">START BATTLE 🚀</button>
+            </div>
+        </div>
+
+        <!-- Game Section -->
+        <div id="game-arena" class="game-area battle-card">
+            <div class="question-box" id="question">What is 25 x 4?</div>
+            <div class="options-grid" id="options">
+                <!-- Dynamically filled -->
+            </div>
+        </div>
+
+        <div id="leaderboard" style="display:none;">
+            <h4 style="margin:0 0 10px 0;">Agent Ranking</h4>
+            <div id="rankings"></div>
+        </div>
+
+        <button onclick="location.href='index.html'" style="position:fixed; bottom:20px; left:20px; width:auto; padding:10px 20px; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border);"><i class="fa-solid fa-arrow-left"></i> EXIT</button>
+    </div>
+
+    <script>
+        const socket = io('http://localhost:5000');
+        let currentRoom = null;
+        let myName = "";
+        let isHost = false;
+
+        function createRoom() {
+            const rid = document.getElementById('roomId').value;
+            myName = document.getElementById('playerName').value;
+            if(!rid || !myName) return alert("Pura details bharo Agent!");
+            isHost = true;
+            currentRoom = rid;
+            socket.emit('createRoom', { roomId: rid, playerName: myName });
+        }
+
+        function joinRoom() {
+            const rid = document.getElementById('roomId').value;
+            myName = document.getElementById('playerName').value;
+            if(!rid || !myName) return alert("Room ID aur Name chahiye!");
+            currentRoom = rid;
+            socket.emit('joinRoom', { roomId: rid, playerName: myName });
+        }
+
+        function startGame() {
+            socket.emit('startGame', currentRoom);
+        }
+
+        socket.on('roomUpdated', (room) => {
+            document.getElementById('roomInfo').style.display = 'block';
+            document.getElementById('currentRoomId').innerText = room.id;
+            const list = document.getElementById('playerList');
+            list.innerHTML = room.players.map(p => `<div class="player-item"><span>${p.name}</span> <span>${p.score} PTS</span></div>`).join('');
+            
+            if(isHost && room.players.length >= 1) {
+                document.getElementById('startBtn').style.display = 'block';
+            }
+            
+            updateLeaderboard(room.players);
+        });
+
+        socket.on('gameStarted', (room) => {
+            document.getElementById('lobby').style.display = 'none';
+            document.getElementById('game-arena').style.display = 'block';
+            document.getElementById('leaderboard').style.display = 'block';
+            loadQuestion();
+        });
+
+        const questData = [
+            { q: "What is the cube root of 27?", a: "3", o: ["3","9","6","1"] },
+            { q: "Which element has symbol 'Au'?", a: "Gold", o: ["Silver","Gold","Copper","Iron"] },
+            { q: "Capital of India?", a: "New Delhi", o: ["Mumbai","New Delhi","Pune","Delhi"] },
+            { q: "Father of AI?", a: "Alan Turing", o: ["Jobs","Elon","Alan Turing","Gates"] }
+        ];
+        let qIndex = 0;
+
+        function loadQuestion() {
+            if(qIndex >= questData.length) {
+                document.getElementById('question').innerText = "Battle Finished! Check Rankings.";
+                document.getElementById('options').innerHTML = "";
+                return;
+            }
+            const data = questData[qIndex];
+            document.getElementById('question').innerText = data.q;
+            const grid = document.getElementById('options');
+            grid.innerHTML = "";
+            data.o.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    const correct = (opt === data.a);
+                    socket.emit('submitAnswer', { roomId: currentRoom, playerName: myName, isCorrect: correct });
+                    qIndex++;
+                    loadQuestion();
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function updateLeaderboard(players) {
+            const board = document.getElementById('rankings');
+            board.innerHTML = players.sort((a,b) => b.score - a.score).map(p => `<div>${p.name}: ${p.score}</div>`).join('');
+        }
+
+        socket.on('error', (msg) => alert(msg));
+
+    </script>
+</body>
+</html>
