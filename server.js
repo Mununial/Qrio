@@ -55,8 +55,11 @@ app.post('/api/signin', (req, res) => {
 
 app.get('/api/points/:userId', (req, res) => {
     const users = readData();
-    if (users[req.params.userId]) res.json({ success: true, points: users[req.params.userId].points });
-    else res.status(404).json({ success: false });
+    if (users[req.params.userId]) {
+        res.json({ success: true, points: users[req.params.userId].points, name: users[req.params.userId].name });
+    } else {
+        res.status(404).json({ success: false });
+    }
 });
 
 app.post('/api/points', (req, res) => {
@@ -67,6 +70,22 @@ app.post('/api/points', (req, res) => {
         writeData(users);
         res.json({ success: true, totalPoints: users[userId].points });
     } else res.status(404).json({ success: false });
+});
+
+app.post('/api/points/redeem', (req, res) => {
+    const { userId, points } = req.body;
+    const users = readData();
+    if (users[userId]) {
+        if (users[userId].points >= points) {
+            users[userId].points -= points;
+            writeData(users);
+            res.json({ success: true, message: 'Points successfully secured!', totalPoints: users[userId].points });
+        } else {
+            res.status(400).json({ success: false, error: 'Insufficient credits in vault.' });
+        }
+    } else {
+        res.status(404).json({ success: false, error: 'User not found in Qrio network.' });
+    }
 });
 
 // --- Socket.io Multiplayer Logic ---

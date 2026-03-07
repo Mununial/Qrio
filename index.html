@@ -2517,6 +2517,7 @@
                         if(document.getElementById('cardIdDisplay')) document.getElementById('cardIdDisplay').innerText = formatIdForCard(activeId);
                         if(document.getElementById('sideNavAvatar')) document.getElementById('sideNavAvatar').src = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${userName}`;
                         if(document.getElementById('sideWalletPoints')) document.getElementById('sideWalletPoints').innerText = data.points + " pts";
+                        if(document.getElementById('totalPointsBoard')) document.getElementById('totalPointsBoard').innerText = "Total: " + data.points + " pts";
                         
                         // Populate legacy score if exists
                         if(document.getElementById('userScoreDisplay')) document.getElementById('userScoreDisplay').innerText = "Points: " + data.points;
@@ -2828,8 +2829,9 @@
             // Centralized Store ID and sync points locally
             localStorage.setItem('qrio_active_id', uniqueId);
 
-            document.getElementById('userScoreDisplay').innerText = "Points: " + currentPoints;
-            document.getElementById('totalPointsBoard').innerText = "Total: " + currentPoints + " pts";
+            if(document.getElementById('sideWalletPoints')) document.getElementById('sideWalletPoints').innerText = currentPoints + " pts";
+            if(document.getElementById('totalPointsBoard')) document.getElementById('totalPointsBoard').innerText = "Total: " + currentPoints + " pts";
+            if(document.getElementById('userScoreDisplay')) document.getElementById('userScoreDisplay').innerText = "Points: " + currentPoints;
 
             // Reset forms
             document.getElementById('signInForm').reset();
@@ -2840,8 +2842,11 @@
             
             // Initializing Welcome Animation
             setTimeout(() => {
-                 document.getElementById('navUsername').classList.add('pulse-name');
-                 setTimeout(() => document.getElementById('navUsername').classList.remove('pulse-name'), 3000);
+                 const nameEl = document.getElementById('navUsername');
+                 if(nameEl) {
+                     nameEl.classList.add('pulse-name');
+                     setTimeout(() => nameEl.classList.remove('pulse-name'), 3000);
+                 }
             }, 1000);
 
         }
@@ -2883,7 +2888,8 @@
                         if (boardEl) boardEl.innerText = "Total: " + val + " pts";
                     };
                     updatePoints(data.totalPoints);
-                    updateText('sideWalletPoints', data.totalPoints + " pts");
+                    const walletEl = document.getElementById('sideWalletPoints');
+                    if (walletEl) walletEl.innerText = data.totalPoints + " pts";
                     
                     // Success Burst Animation
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> SECURED!';
